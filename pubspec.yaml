@@ -1,6 +1,6 @@
 name: docx_template
 description: A Docx template engine.
-version: 0.1.1
+version: 0.1.2
 author: Pavel Snitko <brian57reg@gmail.com>
 homepage: https://github.com/PavelS0/docx_template_dart
 environment:
