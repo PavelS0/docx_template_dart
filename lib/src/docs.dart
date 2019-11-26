@@ -1,10 +1,9 @@
 import 'dart:convert';
-
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:xml/xml.dart';
 import 'package:path/path.dart' as path;
-import 'package:crypto/crypto.dart';
+import 'package:crypto/crypto.dart' as crypto;
 import 'dart:io';
 import 'model.dart';
 import 'visitor.dart';
@@ -33,7 +32,7 @@ class DocxTemplate {
       _cacheDir.create();
     }
     if (await f.exists()) {
-      var tmpDirName = md5
+      var tmpDirName = crypto.md5
           .convert(
               utf8.encode(f.path) + [DateTime.now().millisecondsSinceEpoch])
           .toString();
