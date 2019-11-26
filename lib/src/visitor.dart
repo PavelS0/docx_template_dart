@@ -1,5 +1,6 @@
 import 'package:xml/xml.dart';
 import 'view.dart';
+
 ///
 /// Copy visitor wich can copy custum elements extendeds of View
 ///
@@ -30,11 +31,11 @@ class XmlCopyVisitor with XmlVisitor {
   @override
   XmlElement visitElement(XmlElement node) {
     if (node is View) {
-      return node.createNew(visit(node.name), 
-        node.attributes.map(visit), node.children.map(visit), node.isSelfClosing, node.tag);
+      return node.createNew(visit(node.name), node.attributes.map(visit),
+          node.children.map(visit), node.isSelfClosing, node.tag);
     } else {
-      return XmlElement(visit(node.name),
-        node.attributes.map(visit), node.children.map(visit), node.isSelfClosing);
+      return XmlElement(visit(node.name), node.attributes.map(visit),
+          node.children.map(visit), node.isSelfClosing);
     }
   }
 
