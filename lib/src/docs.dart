@@ -2,29 +2,9 @@ import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:xml/xml.dart';
 import 'dart:io';
-import 'core.dart';
-//import 'init.dart';
-//import 'attach.dart';
-//import 'prepare.dart';
-//import 'produce.dart';
+import 'model.dart';
 import 'visitor.dart';
 import 'view.dart';
-
-/*
-  Проблема во вложенных "вьюхах"
-  Надо сохранять родительский элемент и позицию и деаттачить элемент
-  Рекурсивно делать тоже самое для дочерних элементов.
-
-  А для воспроизведения начинать с глубинных элементов, продюсить их, вставлять в поток и наверх.
-
-  
-
-*/
-
-
-
-
-
 
 class DocxTemplate {
   XmlCopyVisitor visitor = XmlCopyVisitor();

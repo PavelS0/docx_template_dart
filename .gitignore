@@ -4,7 +4,9 @@
 .dart_tool/
 .packages
 .pub/
+.vscode/
 build/
+docx_cache/
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
 

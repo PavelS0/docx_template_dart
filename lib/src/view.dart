@@ -90,6 +90,19 @@ class View<T extends Content> extends XmlElement  {
     return null;
   }
 
+  List<XmlElement> _produceInner(Content c, View v) {
+    List<XmlElement>  produced;
+    if (c.containsKey(v.tag)) {
+      produced = v._produce(c[v.tag]);
+    } else if (c.key == v.tag) {
+      produced = v._produce(c);
+    }
+    if (produced != null) {
+      _replaceWithAll(v, produced, true);
+    }
+    return produced;
+  }
+
   void _replaceWithAll(XmlElement elem, List<XmlElement> to, bool clearParents) {
     if (clearParents) {
        for (XmlElement e in to) {
@@ -125,7 +138,12 @@ class View<T extends Content> extends XmlElement  {
         break;
       case "plain":
         sdtView.content.children.clear();
-        TextView tv = TextView(XmlName("plain"), [], childs, false, sdtView.name);
+        PlainView pv = PlainView(XmlName("plain"), [], childs, false, sdtView.name);
+        v = pv;
+        break;
+      case "text":
+        sdtView.content.children.clear();
+        TextView tv = TextView(XmlName("text"), [], childs, false, sdtView.name);
         v = tv;
         break;
       case "list":
@@ -200,6 +218,25 @@ class TextView extends View<TextContent> {
   }
 }
 
+
+class PlainView extends View<PlainContent> {
+  PlainView(XmlName name, [Iterable<XmlAttribute> attributesIterable = const [], Iterable<XmlNode> children = const [], bool isSelfClosing = true, String tag]) : super(name, attributesIterable, children, isSelfClosing, null, tag);
+  @override
+  List<XmlElement> _produce (PlainContent c) {
+    XmlElement copy = this.accept(_copyVisitor);
+    var views = View._subViews(copy);
+    for (var v in views) {
+      _produceInner(c, v);
+    }
+    return List.from(copy.children);
+  }
+
+  @override
+  PlainView createNew(XmlName name, [Iterable<XmlAttribute> attributesIterable = const [], Iterable<XmlNode> children = const [], bool isSelfClosing = true, String tag]) {
+    return PlainView(name, attributesIterable, children, isSelfClosing, tag);
+  }
+}
+
 class ListView extends View<ListContent> {
   ListView(XmlName name, [Iterable<XmlAttribute> attributesIterable = const [], Iterable<XmlNode> children = const [], bool isSelfClosing = true, String tag]) : super(name, attributesIterable, children, isSelfClosing, null, tag);
 
@@ -210,6 +247,8 @@ class ListView extends View<ListContent> {
       XmlElement copy = this.accept(_copyVisitor);
       var views = View._subViews(copy);
       for (var v in views) {
+        _produceInner(cont, v);
+        /*
         List<XmlElement>  produced;
         if (cont.containsKey(v.tag)) {
           produced = v._produce(cont[v.tag]);
@@ -218,7 +257,7 @@ class ListView extends View<ListContent> {
         }
         if (produced != null) {
           _replaceWithAll(v, produced, true);
-        }
+        }*/
       }      
       if (copy.children != null){
         l.addAll(copy.children.cast<XmlElement>());
@@ -238,26 +277,21 @@ class RowView extends View<TableContent> {
   @override
   List<XmlElement> _produce (TableContent c) {
     List<XmlElement> l = [];
-    for (var cont in c.list) {
+    for (var cont in c.rows) {
       XmlElement copy = this.accept(_copyVisitor);
       var views = View._subViews(copy);
       for (var v in views) {
-        List<XmlElement>  produced;
-        if (cont.containsKey(v.tag)) {
-          produced = v._produce(cont[v.tag]);
-        } else if (cont.key == v.tag) {
-          produced = v._produce(cont);
-        }
-        if (produced != null) {
-          _replaceWithAll(v, produced, true);
-        }
+         _produceInner(cont, v);
       }   
       if (copy.children != null){
         l.addAll(copy.children.cast<XmlElement>());
       }
     }
     return l;
+    
+    /*
     тут надо старое переебать
+    
     List<XmlElement> l = [];
     XmlElement tr = View._findChild(this, "tr");
     for (var cont in c.rows) {
@@ -272,6 +306,7 @@ class RowView extends View<TableContent> {
       l.add(copy);
     }
     return l;
+    */
   }
 
   @override

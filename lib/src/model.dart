@@ -1,12 +1,9 @@
 import 'dart:collection';
 
-import 'package:DocxTemplate/src/core.dart';
-import 'package:xml/xml.dart';
-
 class Content extends MapBase<String, Content> {
   String key;
-  Map<String, Content> sub = Map();
-  Content(this.key);
+  Map<String, Content> sub;
+  Content([this.key, this.sub]);
 
   @override
   Content operator [](Object key) {
@@ -30,26 +27,43 @@ class Content extends MapBase<String, Content> {
   Content remove(Object key) {
     return sub.remove(key);
   }
+  
+  add(Content c) {
+    if(sub == null) {
+      sub = Map();
+    }
+    sub[c.key] = c;
+  }
+}
+
+
+class PlainContent extends Content {
+  PlainContent(String key) : super (key, {});
 }
 
 class TextContent extends Content {
   String text;
-  TextContent(String key, this.text): super (key);
+  TextContent(String key, this.text): super (key, {});
 }
 
 class ListContent extends Content {
   List<Content> list;
-  ListContent (String key, this.list): super (key);
+  ListContent (String key, this.list): super (key, {});
 }
 
 class TableContent extends Content {
   List<RowContent> rows;
-  TableContent (String key, this.rows): super (key);
+  TableContent (String key, this.rows): super (key, {});
+  addRow(RowContent content) {
+    if (rows == null) {
+      rows = List();
+    }
+    rows.add(content);
+  }
 }
 
 class RowContent extends Content {
-  Map<String, Content> cols;
-  RowContent (String key, this.cols): super (key);
+  RowContent ([Map<String, Content> cols]): super ("", cols);
 }
 
 
