@@ -29,7 +29,7 @@ class DocxTemplate {
 
   Future<void> load(File f) async {
     if (!await _cacheDir.exists()) {
-      _cacheDir.create();
+      await _cacheDir.create();
     }
     if (await f.exists()) {
       var tmpDirName = crypto.md5
@@ -40,7 +40,7 @@ class DocxTemplate {
       _tmpDirPath = path.Context(current: cacheDirPath.absolute((tmpDirName)));
       _tmpDir = Directory(_tmpDirPath.current);
       if (!await _tmpDir.exists()) {
-        _tmpDir.create();
+        await _tmpDir.create();
       }
 
       compBytes = await f.readAsBytes();
@@ -85,7 +85,7 @@ class DocxTemplate {
     var encoder = ZipFileEncoder();
     encoder.zipDirectory(_tmpDir, filename: filename);
     if (cleanup) {
-      _tmpDir.delete(recursive: true);
+      await _tmpDir.delete(recursive: true);
       state = State.none;
     }
   }
