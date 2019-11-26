@@ -1,5 +1,7 @@
 import 'dart:collection';
-
+///
+/// Root content element, use method add() to add inner contents
+///
 class Content extends MapBase<String, Content> {
   String key;
   Map<String, Content> sub;
@@ -36,7 +38,10 @@ class Content extends MapBase<String, Content> {
   }
 }
 
-
+///
+/// Plain content take nodes from docx "as is" its useful 
+/// to use with ListContent.
+///
 class PlainContent extends Content {
   PlainContent(String key) : super (key, {});
 }
@@ -64,17 +69,4 @@ class TableContent extends Content {
 
 class RowContent extends Content {
   RowContent ([Map<String, Content> cols]): super ("", cols);
-}
-
-
-///
-/// content["name"] = TextContent("value");
-/// content["posirtions"] = ListContent([TextContent("value"), TextContent("value"), TextContent("value")]);
-/// 
-///
-///
-///
-class Doc {
-  String id;
-  Map<String, Content> elements;
 }

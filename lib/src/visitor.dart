@@ -1,6 +1,8 @@
 import 'package:xml/xml.dart';
 import 'view.dart';
-
+///
+/// Copy visitor wich can copy custum elements extendeds of View
+///
 class XmlCopyVisitor with XmlVisitor {
   static final XmlTransformer defaultInstance = XmlTransformer();
 
