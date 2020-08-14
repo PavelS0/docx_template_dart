@@ -2,103 +2,69 @@ import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:xml/xml.dart';
-import 'package:path/path.dart' as path;
-import 'package:crypto/crypto.dart' as crypto;
-import 'dart:io';
 import 'model.dart';
 import 'visitor.dart';
 import 'view.dart';
 
-enum State { none, loaded, generated }
+class _DocxEntry {
+  _DocxEntry._(this.arch, this.name, this.index, this.data);
+  final Archive arch;
+  final String name;
+  final int index;
+  final String data;
+
+  static _DocxEntry fromArchive(Archive arch, int fileIndex) {
+    final f = arch.files[fileIndex];
+    final bytes = f.content as List<int>;
+    final data = utf8.decode(bytes);
+    final e = _DocxEntry._(arch, f.name, fileIndex, data);
+    return e;
+  }
+
+  static updateArchive(Archive arch, _DocxEntry entry, String data) {
+    List<int> out = utf8.encode(data);
+    arch.files[entry.index] = ArchiveFile(
+        entry.name, out.length, out, arch.files[entry.index].compressionType);
+  }
+}
 
 class DocxTemplate {
+  DocxTemplate._() {}
+
   XmlCopyVisitor visitor = XmlCopyVisitor();
-  Directory _cacheDir = Directory("docx_cache");
-  Directory _tmpDir;
-  path.Context _tmpDirPath;
-  State state = State.none;
+  Archive _arch;
+  _DocxEntry _documentEntry;
 
-  DocxTemplate([cacheDir]) {
-    if (cacheDir != null) {
-      _cacheDir = cacheDir;
-    }
-  }
-  File f;
-  List<int> compBytes;
-  File template;
+  ///
+  /// Load Template from byte buffer of docx file
+  ///
+  static Future<DocxTemplate> fromBytes(List<int> bytes) async {
+    final component = DocxTemplate._();
+    final arch = ZipDecoder().decodeBytes(bytes);
 
-  Future<void> load(File f) async {
-    if (!await _cacheDir.exists()) {
-      await _cacheDir.create();
-    }
-    if (await f.exists()) {
-      var tmpDirName = crypto.md5
-          .convert(
-              utf8.encode(f.path) + [DateTime.now().millisecondsSinceEpoch])
-          .toString();
-      var cacheDirPath = path.Context(current: _cacheDir.path);
-      _tmpDirPath = path.Context(current: cacheDirPath.absolute((tmpDirName)));
-      _tmpDir = Directory(_tmpDirPath.current);
-      if (!await _tmpDir.exists()) {
-        await _tmpDir.create();
-      }
-
-      compBytes = await f.readAsBytes();
-      Archive archive = ZipDecoder().decodeBytes(compBytes);
-      for (ArchiveFile file in archive) {
-        String filename = file.name;
-        if (file.isFile) {
-          List<int> data = file.content;
-          var nf = File(_tmpDirPath.absolute(filename));
-          await nf.create(recursive: true);
-          await nf.writeAsBytes(data);
-        } else {
-          var nd = Directory(_tmpDirPath.absolute(filename));
-          await nd.create(recursive: true);
-        }
-      }
-      state = State.loaded;
+    final di =
+        arch.files.indexWhere((element) => element.name == 'word/document.xml');
+    if (di >= 0) {
+      component._documentEntry = _DocxEntry.fromArchive(arch, di);
     } else {
-      throw Exception("file not found");
+      throw FormatException('Docx have unsupported format');
     }
+
+    component._arch = arch;
+    return component;
   }
 
-  Future<void> generate(Content c) async {
-    if (state != State.loaded) {
-      throw Exception("Cannot generate docx, template not loaded");
-    }
-    template = File(_tmpDirPath.absolute("word", "document.xml"));
-    if (await template.exists()) {
-      XmlDocument doc = parse(await template.readAsString());
-      var v = View.attchToDoc(doc);
-      v.produce(c);
-      String ermak = doc.toXmlString(pretty: false);
-      await template.writeAsString(ermak);
-      state = State.generated;
-    }
-  }
+  ///
+  /// Generates byte buffer with docx file content by given [c]
+  ///
+  Future<List<int>> generate(Content c) async {
+    XmlDocument doc = parse(_documentEntry.data);
+    var v = View.attchToDoc(doc);
+    v.produce(c);
+    String out = doc.toXmlString(pretty: false);
+    _DocxEntry.updateArchive(_arch, _documentEntry, out);
 
-  Future<void> save(String filename, [cleanup = true]) async {
-    if (state != State.generated) {
-      throw Exception("Cannot save docx not generated");
-    }
-    var encoder = ZipFileEncoder();
-    encoder.zipDirectory(_tmpDir, filename: filename);
-    if (cleanup) {
-      await _tmpDir.delete(recursive: true);
-      state = State.none;
-    }
-  }
-
-  List<int> saveAsBytes([cleanup = true]) {
-    if (state != State.generated) {
-      throw Exception("Cannot save docx not generated");
-    }
-    Archive a = createArchiveFromDirectory(_tmpDir, includeDirName: false);
-    if (cleanup) {
-      _tmpDir.delete(recursive: true);
-      state = State.none;
-    }
-    return ZipEncoder().encode(a);
+    final enc = ZipEncoder();
+    return enc.encode(_arch);
   }
 }

@@ -43,19 +43,6 @@ class Content extends MapBase<String, Content> {
   ///
   static List<Content> fromMap(Map<String, dynamic> map) {
     throw Exception("not implemented");
-    /*
-    List<Content> l = List();
-    map.forEach((k, v){
-      if (v is Map) {
-        l.add(Content());
-      } else if (v is List) {
-
-      } else {
-        l.add(TextContent(k, v.toString()));
-      }
-    });
-    return l;
-    */
   }
 }
 

@@ -4,8 +4,8 @@ import 'package:test/test.dart';
 
 void main() {
   test('generate', () async {
-    DocxTemplate docx = DocxTemplate();
-    await docx.load(File("template.docx"));
+    final f = File("template.docx");
+    final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
 
     Content c = Content();
     c
@@ -33,7 +33,8 @@ void main() {
         PlainContent("plainview")..add(c["table"])
       ]));
 
-    await docx.generate(c);
-    await docx.save("generated.docx");
+    final d = await docx.generate(c);
+    final of = File('out.docx');
+    await of.writeAsBytes(d);
   });
 }
