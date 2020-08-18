@@ -1,5 +1,4 @@
-import 'package:xml/xml.dart';
-import 'view.dart';
+part of docx_view;
 
 ///
 /// Copy visitor wich can copy custum elements extendeds of View

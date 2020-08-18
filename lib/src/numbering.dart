@@ -27,7 +27,7 @@ class Numbering {
     String out = doc.toXmlString(pretty: false);
 
     _modified = true;
-    return '0';
+    return '45';
   }
 
   flushToArchive() {

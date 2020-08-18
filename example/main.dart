@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:docx_template/src/docs.dart';
+import 'package:docx_template/src/template.dart';
 import 'package:docx_template/src/model.dart';
 
 ///

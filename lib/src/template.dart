@@ -1,12 +1,10 @@
-import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
+import 'package:docx_template/src/model.dart';
 import 'package:docx_template/src/numbering.dart';
+import 'package:docx_template/src/view_manager.dart';
 import 'package:xml/xml.dart';
 import 'docx_entry.dart';
-import 'model.dart';
-import 'visitor.dart';
-import 'view.dart';
 
 class DocxTemplate {
   DocxTemplate._() {}
@@ -38,9 +36,9 @@ class DocxTemplate {
   ///
   Future<List<int>> generate(Content c) async {
     XmlDocument doc = parse(_documentEntry.data);
-    var v = View.attchToDoc(doc, this);
-    v.produce(c);
-    String out = doc.toXmlString(pretty: false);
+    final vm = ViewManager.attach(doc, this);
+    vm.produce(c);
+    String out = doc.toXmlString(pretty: true);
     DocxEntry.updateArchive(_arch, _documentEntry, out);
 
     final enc = ZipEncoder();

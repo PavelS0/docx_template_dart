@@ -18,8 +18,10 @@ void main() {
         RowContent()
           ..add(TextContent("key1", "Wiktor"))
           ..add(TextContent("key2", "Wojtas"))
-          ..add(ListContent("tablelist",
-              [TextContent("value", "b"), TextContent("value", "c")]))
+          ..add(ListContent("tablelist", [
+            TextContent("value", "ONE TIME MORE"),
+            TextContent("value", "c")
+          ]))
       ]))
       ..add(ListContent("list", [
         TextContent("value", "b")

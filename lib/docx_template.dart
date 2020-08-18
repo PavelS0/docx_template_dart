@@ -1,2 +1,4 @@
-export 'src/docs.dart' show DocxTemplate;
+library docx_template;
+
+export 'src/template.dart' show DocxTemplate;
 export 'src/model.dart';
