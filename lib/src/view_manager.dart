@@ -12,7 +12,6 @@ class ViewManager {
   final XmlCopyVisitor _copyVisitor = XmlCopyVisitor();
   final DocxTemplate t;
   final View root;
-  Map<String, List<View>> _sub = {};
   Queue<View> _viewStack = Queue();
   ViewManager._(this.t, this.root);
 
@@ -71,21 +70,6 @@ class ViewManager {
       sdtParent.children.remove(sdt);
       sdtParent.children.insert(sdtIndex, v);
 
-      /* Map<String, List<View>> sub;
-      if (parent != null) {
-        if (parent.sub == null) {
-          parent.sub = {};
-        }
-        sub = parent.sub;
-      } else {
-        sub = _sub;
-      }
-      if (sub.containsKey(sdtView.name)) {
-        sub[sdtView.name].add(v);
-      } else {
-        sub[sdtView.name] = [v];
-      } */
-
       if (parent.sub == null) {
         parent.sub = {};
       }
@@ -106,34 +90,16 @@ class ViewManager {
         _produceInner(c, v);
       }
     }
-    /* if (_sub != null) {
-      for (var key in _sub.keys) {
-        for (var v in _sub[key]) {
-          List<XmlElement> list;
-          if (c.containsKey(key)) {
-            print('prod $key');
-            list = v.produce(c[key]);
-          } else {
-            print('prod $key with null');
-            list = v.produce(null);
-          }
-          View.replaceWithAll(v, list, true);
-        }
-      }
-    } */
   }
 
   List<XmlElement> _produceInner(Content c, View v) {
     _viewStack.addFirst(v);
     List<XmlElement> produced;
     if (c != null && c.containsKey(v.tag)) {
-      print('prod ${v.tag}');
       produced = v.produce(c[v.tag]);
     } else if (c != null && c.key == v.tag) {
-      print('prod ${v.tag} | text');
       produced = v.produce(c);
     } else {
-      print('prod ${v.tag} with null');
       produced = v.produce(null);
     }
     View.replaceWithAll(v, produced, true);

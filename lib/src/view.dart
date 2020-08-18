@@ -83,12 +83,7 @@ class View<T extends Content> extends XmlElement {
         if (e.parent != null) {
           e.parent.children.remove(e);
         }
-        print(e.parent != null ? 'NOT NULL' : 'NULL');
       }
-    }
-
-    if (elem.name.local == 'table') {
-      print(elem.name);
     }
     if (elem.parent != null) {
       // Root elem not have parents
@@ -120,17 +115,21 @@ class TextView extends View<TextContent> {
       : super(vm, name, attributesIterable, children, isSelfClosing, tag);
   @override
   List<XmlElement> produce(TextContent c) {
-    List<XmlElement> list = [];
-    bool textInserted = false;
-    for (XmlElement e in this.children) {
-      if (e.name.local == 'r') {
-        if (!textInserted) {
-          if (c != null) _findAndReplaceText(e, c.text);
+    List<XmlElement> list;
+    if (c == null) {
+      list = List.from(this.children);
+    } else {
+      bool textInserted = false;
+      for (XmlElement e in this.children) {
+        if (e.name.local == 'r') {
+          if (!textInserted) {
+            if (c != null) _findAndReplaceText(e, c.text);
+            list.add(e);
+            textInserted = true;
+          }
+        } else {
           list.add(e);
-          textInserted = true;
         }
-      } else {
-        list.add(e);
       }
     }
     return list;
