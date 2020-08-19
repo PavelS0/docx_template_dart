@@ -3,22 +3,30 @@ library docx_view;
 import 'dart:collection';
 
 import 'package:docx_template/docx_template.dart';
+import 'package:docx_template/src/docx_entry.dart';
 import 'package:xml/xml.dart';
 
 part 'view.dart';
 part 'visitor.dart';
+part 'numbering.dart';
 
 class ViewManager {
   final XmlCopyVisitor _copyVisitor = XmlCopyVisitor();
   final DocxTemplate t;
   final View root;
-  Queue<View> _viewStack = Queue();
-  ViewManager._(this.t, this.root);
+  final Numbering numbering;
 
-  factory ViewManager.attach(XmlDocument document, DocxTemplate t) {
+  Queue<View> _viewStack = Queue();
+  ViewManager._(this.t, this.root, this.numbering);
+
+  factory ViewManager.attach(
+      DocxEntry documentEntry, DocxEntry numberingEntry, DocxTemplate t) {
     final root = View(null, XmlName('root'));
-    ViewManager vm = ViewManager._(t, root);
-    vm._init(document.rootElement, root);
+
+    final numbering = Numbering.from(numberingEntry);
+    ViewManager vm = ViewManager._(t, root, numbering);
+    vm._init(documentEntry.doc.rootElement, root);
+
     return vm;
   }
 

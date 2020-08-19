@@ -113,26 +113,16 @@ class TextView extends View<TextContent> {
       bool isSelfClosing = true,
       String tag])
       : super(vm, name, attributesIterable, children, isSelfClosing, tag);
+
   @override
   List<XmlElement> produce(TextContent c) {
-    List<XmlElement> list;
-    if (c == null) {
-      list = List.from(this.children);
-    } else {
-      bool textInserted = false;
-      for (XmlElement e in this.children) {
-        if (e.name.local == 'r') {
-          if (!textInserted) {
-            if (c != null) _findAndReplaceText(e, c.text);
-            list.add(e);
-            textInserted = true;
-          }
-        } else {
-          list.add(e);
-        }
-      }
+    XmlElement copy = this.accept(vm._copyVisitor);
+    final r = findR(copy);
+    if (r != null) {
+      removeRSiblings(r);
+      updateRText(r, c != null ? c.text : '');
     }
-    return list;
+    return List.from(copy.children);
   }
 
   @override
@@ -142,6 +132,39 @@ class TextView extends View<TextContent> {
       bool isSelfClosing = true,
       String tag]) {
     return TextView(vm, name, attributesIterable, children, isSelfClosing, tag);
+  }
+
+  XmlElement findR(XmlElement src) =>
+      src.descendants.firstWhere((e) => e is XmlElement && e.name.local == 'r');
+
+  void removeRSiblings(XmlElement sib) {
+    final parent = sib.parent;
+
+    XmlElement next = sib.nextSibling;
+    while (next != null) {
+      final laterNext = next.nextSibling;
+      if (next.name.local == 'r') {
+        parent.children.remove(next);
+      }
+      next = laterNext;
+    }
+
+    XmlElement prev = sib.previousSibling;
+    while (prev != null) {
+      final laterPrev = prev.previousSibling;
+      if (prev.name.local == 'r') {
+        parent.children.remove(prev);
+      }
+      prev = laterPrev;
+    }
+  }
+
+  void updateRText(XmlElement r, String text) {
+    final t =
+        r.children.firstWhere((e) => e is XmlElement && e.name.local == 't');
+    if (t != null) {
+      t.children[0] = XmlText(text);
+    }
   }
 
   void _findAndReplaceText(XmlElement from, String text) {
@@ -189,19 +212,42 @@ class ListView extends View<ListContent> {
       String tag])
       : super(vm, name, attributesIterable, children, isSelfClosing, tag);
 
-  void _changeListId(XmlElement copy) {
-    if (copy.children.isNotEmpty) {
-      final e = copy.children.first;
+  XmlElement _findFirstChild(XmlElement src, String name) =>
+      src.children.firstWhere((e) => e is XmlElement && e.name.local == name);
+
+  XmlElement _getNumIdNode(XmlElement list) {
+    if (list.children.isNotEmpty) {
+      final e = list.children.first;
       if (e is XmlElement) {
-        final elements = e.findElements('numId', namespace: 'w');
-        if (elements.isNotEmpty) {
-          final e = elements.first;
-          final idNode = e.getAttributeNode('val');
-          final newId = vm.t.numbering.copy(idNode.value);
-          /* e.attributes.remove(idNode);
-          e.attributes.add(XmlAttribute(XmlName('val', 'w'), newId)); */
+        final pPr = _findFirstChild(e, 'pPr');
+        if (pPr != null) {
+          final numPr = _findFirstChild(pPr, 'numPr');
+          if (numPr != null) {
+            final numId = _findFirstChild(numPr, 'numId');
+            return numId;
+          }
         }
       }
+    }
+    return null;
+  }
+
+  String _getNewNumId(XmlElement list) {
+    final numId = _getNumIdNode(list);
+    if (numId != null) {
+      final idNode = numId.getAttributeNode('val', namespace: '*');
+      final newId = vm.numbering.copy(idNode.value);
+      return newId;
+    }
+    return '';
+  }
+
+  void _changeListId(XmlElement copy, String newId) {
+    final numId = _getNumIdNode(copy);
+    if (numId != null) {
+      final idNode = numId.getAttributeNode('val', namespace: '*');
+      numId.attributes.remove(idNode);
+      numId.attributes.add(XmlAttribute(XmlName('val', 'w'), newId));
     }
   }
 
@@ -238,11 +284,17 @@ class ListView extends View<ListContent> {
       }
       /*  */
     } else {
+      final vs = vm._viewStack;
+      String newNumId;
+      if (vs.any((element) => element is PlainView || element is RowView)) {
+        newNumId = _getNewNumId(this);
+      }
       for (var cont in c.list) {
         XmlElement copy = this.accept(vm._copyVisitor);
-        final vs = vm._viewStack;
-        if (vs.any((element) => element is PlainView || element is RowView)) {
-          _changeListId(copy);
+
+        if (newNumId != null &&
+            vs.any((element) => element is PlainView || element is RowView)) {
+          _changeListId(copy, newNumId);
         }
 
         var views = View.subViews(copy);

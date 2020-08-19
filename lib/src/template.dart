@@ -1,18 +1,15 @@
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:docx_template/src/model.dart';
-import 'package:docx_template/src/numbering.dart';
 import 'package:docx_template/src/view_manager.dart';
-import 'package:xml/xml.dart';
 import 'docx_entry.dart';
 
 class DocxTemplate {
   DocxTemplate._() {}
 
-  XmlCopyVisitor visitor = XmlCopyVisitor();
   Archive _arch;
   DocxEntry _documentEntry;
-  Numbering numbering;
+  DocxEntry _numberingEntry;
 
   ///
   /// Load Template from byte buffer of docx file
@@ -22,12 +19,15 @@ class DocxTemplate {
     final arch = ZipDecoder().decodeBytes(bytes);
 
     final docEntry = DocxEntry.fromArchive(arch, 'word/document.xml');
-    if (docEntry == null) {
+    final numberingEntry = DocxEntry.fromArchive(arch, 'word/numbering.xml');
+    if (docEntry == null || numberingEntry == null) {
       throw FormatException('Docx have unsupported format');
     }
+
     component._documentEntry = docEntry;
+    component._numberingEntry = numberingEntry;
     component._arch = arch;
-    component.numbering = Numbering.from(arch);
+
     return component;
   }
 
@@ -35,11 +35,10 @@ class DocxTemplate {
   /// Generates byte buffer with docx file content by given [c]
   ///
   Future<List<int>> generate(Content c) async {
-    XmlDocument doc = parse(_documentEntry.data);
-    final vm = ViewManager.attach(doc, this);
+    final vm = ViewManager.attach(_documentEntry, _numberingEntry, this);
     vm.produce(c);
-    String out = doc.toXmlString(pretty: true);
-    DocxEntry.updateArchive(_arch, _documentEntry, out);
+    DocxEntry.updateArchive(_arch, _documentEntry);
+    DocxEntry.updateArchive(_arch, _numberingEntry);
 
     final enc = ZipEncoder();
     return enc.encode(_arch);

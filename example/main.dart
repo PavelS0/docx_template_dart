@@ -4,7 +4,7 @@ import 'package:docx_template/src/template.dart';
 import 'package:docx_template/src/model.dart';
 
 ///
-/// Read file template.docx, produce it and save as
+/// Read file template.docx, produce it and save
 ///
 void main() async {
   final f = File("template.docx");
@@ -13,28 +13,64 @@ void main() async {
   Content c = Content();
   c
     ..add(TextContent("docname", "Simple docname"))
-    ..add(TextContent("passport", "passport 1234 432134"))
+    ..add(TextContent("passport", "Passport NE0323 4456673"))
     ..add(TableContent("table", [
       RowContent()
         ..add(TextContent("key1", "Paul"))
-        ..add(TextContent("key2", "Viberg")),
+        ..add(TextContent("key2", "Viberg"))
+        ..add(TextContent("key3", "Engineer")),
       RowContent()
-        ..add(TextContent("key1", "Wiktor"))
-        ..add(TextContent("key2", "Wojtas"))
-        ..add(ListContent("tablelist",
-            [TextContent("value", "b"), TextContent("value", "c")]))
+        ..add(TextContent("key1", "Alex"))
+        ..add(TextContent("key2", "Houser"))
+        ..add(TextContent("key3", "CEO & Founder"))
+        ..add(ListContent("tablelist", [
+          TextContent("value", "Mercedes-Benz C-Class S205"),
+          TextContent("value", "Lexus LX 570")
+        ]))
     ]))
     ..add(ListContent("list", [
-      TextContent("value", "b")
+      TextContent("value", "Engine")
         ..add(ListContent("listnested",
-            [TextContent("value", "aaaaa"), TextContent("value", "bbbb")])),
-      TextContent("value", "b"),
-      TextContent("value", "c")
+            [TextContent("value", "BMW M30"), TextContent("value", "2GZ GE")])),
+      TextContent("value", "Gearbox"),
+      TextContent("value", "Chassis")
     ]))
     ..add(ListContent("plainlist", [
-      PlainContent("plainview")..add(c["table"]),
-      PlainContent("plainview")..add(c["table"])
+      PlainContent("plainview")
+        ..add(TableContent("table", [
+          RowContent()
+            ..add(TextContent("key1", "Paul"))
+            ..add(TextContent("key2", "Viberg"))
+            ..add(TextContent("key3", "Engineer")),
+          RowContent()
+            ..add(TextContent("key1", "Alex"))
+            ..add(TextContent("key2", "Houser"))
+            ..add(TextContent("key3", "CEO & Founder"))
+            ..add(ListContent("tablelist", [
+              TextContent("value", "Mercedes-Benz C-Class S205"),
+              TextContent("value", "Lexus LX 570")
+            ]))
+        ])),
+      PlainContent("plainview")
+        ..add(TableContent("table", [
+          RowContent()
+            ..add(TextContent("key1", "Nathan"))
+            ..add(TextContent("key2", "Anceaux"))
+            ..add(TextContent("key3", "Music artist"))
+            ..add(ListContent(
+                "tablelist", [TextContent("value", "Peugeot 508")])),
+          RowContent()
+            ..add(TextContent("key1", "Louis"))
+            ..add(TextContent("key2", "Houplain"))
+            ..add(TextContent("key3", "Music artist"))
+            ..add(ListContent("tablelist", [
+              TextContent("value", "Range Rover Velar"),
+              TextContent("value", "Lada Vesta SW Sport")
+            ]))
+        ])),
     ]));
 
-  await docx.generate(c);
+  final d = await docx.generate(c);
+  final of = File('generated.docx');
+  await of.writeAsBytes(d);
 }
