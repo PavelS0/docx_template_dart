@@ -1,7 +1,9 @@
 # docx_template_dart
 A Docx template engine
 
-Generates docx from template file (see template.docx in repo root) with content controls. Enable developer mode in MS Word to see content controls tags.
+Generates docx from template file (see template.docx in repo root) with content controls.
+First, Enable developer mode in MS Word to see content controls tags. 
+Then, Go to the Developer tab and enable Design Mode. Tags will appear, then click Properties to open a window with options, where tag is the name of the tag, for example: list, table, text, plain. Title - name of the block, for example: cars. If we set the tag equal to 'list' and the title equal to 'cars', then we must use the corresponding ListContent ('cars', [*here contents*]), for the 'text' tag and the title equal to 'block_name' we use TextContent('block_name', 'Example text') etc.
 
 # Example
 
