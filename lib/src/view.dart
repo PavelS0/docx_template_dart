@@ -166,14 +166,6 @@ class TextView extends View<TextContent> {
       t.children[0] = XmlText(text);
     }
   }
-
-  void _findAndReplaceText(XmlElement from, String text) {
-    XmlText t = from.descendants
-        .firstWhere((test) => test is XmlText, orElse: () => null);
-    if (t != null) {
-      t.parent.children[0] = XmlText(text);
-    }
-  }
 }
 
 class PlainView extends View<PlainContent> {
@@ -258,7 +250,7 @@ class ListView extends View<ListContent> {
       if (vm._viewStack.length >= 2 && vm._viewStack.elementAt(1) is RowView) {
         //
 
-        final doc = parse('''
+        final doc = XmlDocument.parse('''
         <w:p>
           <w:pPr>
             <w:pStyle w:val="TableContents"/>

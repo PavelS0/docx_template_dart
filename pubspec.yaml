@@ -1,15 +1,15 @@
 name: docx_template
 description: A Docx template engine.
-version: 0.2.0
+version: 0.2.1
 homepage: https://github.com/PavelS0/docx_template_dart
 environment:
   sdk: '>=2.5.0 <3.0.0'
 
 dependencies:
-  archive: ^2.0.11
-  xml: ^3.5.0
-  crypto: ^2.1.3
-  path: ^1.6.4
+  archive: ^2.0.0
+  xml: ^4.4.0
+  crypto: ^2.1.0
+  path: ^1.6.0
 
 dev_dependencies:
   pedantic: ^1.8.0

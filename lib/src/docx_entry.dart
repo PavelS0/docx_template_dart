@@ -18,7 +18,7 @@ class DocxEntry {
     final f = arch.files[ei];
     final bytes = f.content as List<int>;
     final data = utf8.decode(bytes);
-    final doc = parse(data);
+    final doc = XmlDocument.parse(data);
     final e = DocxEntry._(arch, f.name, ei, doc);
     return e;
   }

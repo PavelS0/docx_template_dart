@@ -1,11 +1,10 @@
 import 'package:archive/archive.dart';
-import 'package:archive/archive_io.dart';
 import 'package:docx_template/src/model.dart';
 import 'package:docx_template/src/view_manager.dart';
 import 'docx_entry.dart';
 
 class DocxTemplate {
-  DocxTemplate._() {}
+  DocxTemplate._();
 
   Archive _arch;
   DocxEntry _documentEntry;
