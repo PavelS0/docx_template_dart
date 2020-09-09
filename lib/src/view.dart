@@ -228,8 +228,12 @@ class ListView extends View<ListContent> {
     final numId = _getNumIdNode(list);
     if (numId != null) {
       final idNode = numId.getAttributeNode('val', namespace: '*');
-      final newId = vm.numbering.copy(idNode.value);
-      return newId;
+      if (vm.numbering != null) {
+        final newId = vm.numbering.copy(idNode.value);
+        return newId;
+      } else {
+        return idNode.value;
+      }
     }
     return '';
   }

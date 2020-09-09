@@ -22,8 +22,10 @@ class ViewManager {
   factory ViewManager.attach(
       DocxEntry documentEntry, DocxEntry numberingEntry, DocxTemplate t) {
     final root = View(null, XmlName('root'));
-
-    final numbering = Numbering.from(numberingEntry);
+    Numbering numbering;
+    if (numberingEntry != null) {
+      numbering = Numbering.from(numberingEntry);
+    }
     ViewManager vm = ViewManager._(t, root, numbering);
     vm._init(documentEntry.doc.rootElement, root);
 
