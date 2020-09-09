@@ -56,7 +56,13 @@ class PlainContent extends Content {
 
 class TextContent extends Content {
   String text;
-  TextContent(String key, this.text) : super(key, {});
+  TextContent(String key, dynamic text) : super(key, {}) {
+    if (text is String) {
+      this.text = text;
+    } else {
+      this.text = text.toString();
+    }
+  }
 }
 
 class ListContent extends Content {
