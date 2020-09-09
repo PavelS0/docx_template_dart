@@ -24,7 +24,7 @@ class DocxEntry {
   }
 
   static updateArchive(Archive arch, DocxEntry entry) {
-    final data = entry.doc.toXmlString(pretty: true);
+    final data = entry.doc.toXmlString(pretty: false);
     List<int> out = utf8.encode(data);
     arch.files[entry.index] = ArchiveFile(
         entry.name, out.length, out, arch.files[entry.index].compressionType);

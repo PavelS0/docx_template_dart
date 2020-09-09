@@ -14,3 +14,4 @@
 
 ## 0.2.2
 - TextContent now accept text of dynamic type
+- Disable pretty output
