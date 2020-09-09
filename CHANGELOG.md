@@ -11,3 +11,6 @@
 ## 0.2.1
 - Removed unused import of dart:io, fixed support dart:js
 - Updated package:xml to newer 4.* version
+
+## 0.2.2
+- TextContent now accept text of dynamic type
