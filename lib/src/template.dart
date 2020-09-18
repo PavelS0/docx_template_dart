@@ -37,7 +37,9 @@ class DocxTemplate {
     final vm = ViewManager.attach(_documentEntry, _numberingEntry, this);
     vm.produce(c);
     DocxEntry.updateArchive(_arch, _documentEntry);
-    DocxEntry.updateArchive(_arch, _numberingEntry);
+    if (_numberingEntry != null) {
+      DocxEntry.updateArchive(_arch, _numberingEntry);
+    }
 
     final enc = ZipEncoder();
     return enc.encode(_arch);
