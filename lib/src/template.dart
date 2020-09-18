@@ -19,7 +19,7 @@ class DocxTemplate {
 
     final docEntry = DocxEntry.fromArchive(arch, 'word/document.xml');
     final numberingEntry = DocxEntry.fromArchive(arch, 'word/numbering.xml');
-    if (docEntry == null || numberingEntry == null) {
+    if (docEntry == null) {
       throw FormatException('Docx have unsupported format');
     }
 
