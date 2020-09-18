@@ -12,7 +12,7 @@ class DocxEntry {
 
   static DocxEntry fromArchive(Archive arch, String entryName) {
     final ei = arch.files.indexWhere((element) => element.name == entryName);
-    if (ei >= 0) {
+    if (ei < 0) {
       return null;
     }
     final f = arch.files[ei];
