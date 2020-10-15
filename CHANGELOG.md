@@ -15,3 +15,6 @@
 ## 0.2.2
 - TextContent now accept text of dynamic type
 - Disable pretty output
+
+## 0.2.3
+- Fixed StateError (Bad state: No element) in _findFirstChild

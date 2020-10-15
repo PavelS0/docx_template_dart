@@ -204,8 +204,10 @@ class ListView extends View<ListContent> {
       String tag])
       : super(vm, name, attributesIterable, children, isSelfClosing, tag);
 
-  XmlElement _findFirstChild(XmlElement src, String name) =>
-      src.children.firstWhere((e) => e is XmlElement && e.name.local == name);
+  XmlElement _findFirstChild(XmlElement src, String name) => src
+          .children.isNotEmpty
+      ? src.children.firstWhere((e) => e is XmlElement && e.name.local == name)
+      : null;
 
   XmlElement _getNumIdNode(XmlElement list) {
     if (list.children.isNotEmpty) {
