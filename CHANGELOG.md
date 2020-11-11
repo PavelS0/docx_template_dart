@@ -18,3 +18,6 @@
 
 ## 0.2.3
 - Fixed StateError (Bad state: No element) in _findFirstChild
+
+## 0.2.4
+- Added support for multiline strings

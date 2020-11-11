@@ -119,8 +119,8 @@ class TextView extends View<TextContent> {
     XmlElement copy = this.accept(vm._copyVisitor);
     final r = findR(copy);
     if (r != null) {
-      removeRSiblings(r);
-      updateRText(r, c != null ? c.text : '');
+      _removeRSiblings(r);
+      _updateRText(r, c != null ? c.text : '');
     }
     return List.from(copy.children);
   }
@@ -137,7 +137,7 @@ class TextView extends View<TextContent> {
   XmlElement findR(XmlElement src) =>
       src.descendants.firstWhere((e) => e is XmlElement && e.name.local == 'r');
 
-  void removeRSiblings(XmlElement sib) {
+  void _removeRSiblings(XmlElement sib) {
     final parent = sib.parent;
 
     XmlElement next = sib.nextSibling;
@@ -159,11 +159,40 @@ class TextView extends View<TextContent> {
     }
   }
 
-  void updateRText(XmlElement r, String text) {
-    final t =
-        r.children.firstWhere((e) => e is XmlElement && e.name.local == 't');
-    if (t != null) {
-      t.children[0] = XmlText(text);
+  List<XmlElement> _makeTCopies(XmlElement t, int totalCount) {
+    final tCopies = <XmlElement>[];
+    for (var i = 0; i < totalCount; i++) {
+      tCopies.add(t.accept(vm._copyVisitor));
+    }
+    return tCopies;
+  }
+
+  XmlElement _brElement() => XmlElement(XmlName('br', 'w'));
+
+  void _updateRText(XmlElement r, String text) {
+    final tIndex =
+        r.children.indexWhere((e) => e is XmlElement && e.name.local == 't');
+    if (tIndex >= 0) {
+      final t = r.children[tIndex];
+      var multiline = text != null && text.contains('\n');
+      if (multiline) {
+        var pasteIndex = tIndex + 1;
+        final lines = text.split('\n');
+        for (var l in lines) {
+          if (l == lines.first) {
+            // Update exists T tag
+            t.children[0] = XmlText(l);
+          } else {
+            // Make T tag copy and add to R
+            final XmlElement tCp = t.accept(vm._copyVisitor);
+            tCp.children[0] = XmlText(l);
+            r.children.insert(pasteIndex++, tCp);
+          }
+          r.children.insert(pasteIndex++, _brElement());
+        }
+      } else {
+        t.children[0] = XmlText(text);
+      }
     }
   }
 }

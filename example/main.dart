@@ -68,7 +68,16 @@ void main() async {
               TextContent("value", "Lada Vesta SW Sport")
             ]))
         ])),
-    ]));
+    ]))
+    ..add(ListContent("multilineList", [
+      PlainContent("multilinePlain")
+        ..add(TextContent('multilineText', 'line 1')),
+      PlainContent("multilinePlain")
+        ..add(TextContent('multilineText', 'line 2')),
+      PlainContent("multilinePlain")
+        ..add(TextContent('multilineText', 'line 3'))
+    ]))
+    ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'));
 
   final d = await docx.generate(c);
   final of = File('generated.docx');

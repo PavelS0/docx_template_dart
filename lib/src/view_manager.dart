@@ -44,41 +44,66 @@ class ViewManager {
     });
   }
 
+  void _replaceSdtWithView(SdtView sdtView, View v) {
+    final sdt = sdtView.sdt;
+    var sdtParent = sdt.parent;
+    var sdtIndex = sdtParent.children.indexOf(sdtView.sdt);
+    sdtParent.children.remove(sdt);
+    sdtParent.children.insert(sdtIndex, v);
+  }
+
+  View _initTable(SdtView sdtView) {
+    final childs = sdtView.content.children.toList();
+    sdtView.content.children.clear();
+    RowView tabv =
+        RowView(this, XmlName("table"), [], childs, false, sdtView.name);
+    return tabv;
+  }
+
+  View _initPlain(SdtView sdtView) {
+    var childs = sdtView.content.children.toList();
+    sdtView.content.children.clear();
+    PlainView pv =
+        PlainView(this, XmlName("plain"), [], childs, false, sdtView.name);
+    return pv;
+  }
+
+  View _initText(SdtView sdtView) {
+    var childs = sdtView.content.children.toList();
+    sdtView.content.children.clear();
+    TextView tv =
+        TextView(this, XmlName("text"), [], childs, false, sdtView.name);
+    return tv;
+  }
+
+  View _initList(SdtView sdtView) {
+    var childs = sdtView.content.children.toList();
+    sdtView.content.children.clear();
+    ListView lv =
+        ListView(this, XmlName("list"), [], childs, false, sdtView.name);
+    return lv;
+  }
+
   View _initView(SdtView sdtView, View parent) {
     View v;
-    var sdt = sdtView.sdt;
-    var childs = sdtView.content.children.toList();
+    final sdt = sdtView.sdt;
+
     switch (sdtView.tag) {
       case "table":
-        sdtView.content.children.clear();
-        RowView tabv =
-            RowView(this, XmlName("table"), [], childs, false, sdtView.name);
-        v = tabv;
+        v = _initTable(sdtView);
         break;
       case "plain":
-        sdtView.content.children.clear();
-        PlainView pv =
-            PlainView(this, XmlName("plain"), [], childs, false, sdtView.name);
-        v = pv;
+        v = _initPlain(sdtView);
         break;
       case "text":
-        sdtView.content.children.clear();
-        TextView tv =
-            TextView(this, XmlName("text"), [], childs, false, sdtView.name);
-        v = tv;
+        v = _initText(sdtView);
         break;
       case "list":
-        sdtView.content.children.clear();
-        ListView lv =
-            ListView(this, XmlName("list"), [], childs, false, sdtView.name);
-        v = lv;
+        v = _initList(sdtView);
         break;
     }
     if (v != null) {
-      var sdtParent = sdt.parent;
-      var sdtIndex = sdtParent.children.indexOf(sdtView.sdt);
-      sdtParent.children.remove(sdt);
-      sdtParent.children.insert(sdtIndex, v);
+      _replaceSdtWithView(sdtView, v);
 
       if (parent.sub == null) {
         parent.sub = {};
