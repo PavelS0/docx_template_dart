@@ -408,26 +408,19 @@ class ImgView extends View<ImageContent> {
     l = List.from(copy.children);
     if (c != null) {
       final pr = copy.descendants.firstWhere(
-          (e) => e is XmlElement && e.name.local == 'docPr',
+          (e) => e is XmlElement && e.name.local == 'blip',
           orElse: () => null);
       if (pr != null) {
-        final idAttr = pr.getAttribute('id');
-        final descrAttr = pr.getAttribute('descr');
-        String ext = _getExt(descrAttr);
-        if (ext == null) {
-          ext = 'jpeg';
-        }
+        final idAttr = pr.getAttribute('r:embed');
 
         final docRels = vm.docxManager
-            .getEntry(() => DocxXmlEntry(), 'word/_rels/document.xml.rels');
-        final fname = 'word/media/image$idAttr.$ext';
-
+            .getEntry(() => DocxRelsEntry(), 'word/_rels/document.xml.rels');
         if (docRels != null) {
-          final rels = docRels.doc.rootElement;
-        }
-
-        if (vm.docxManager.has(fname)) {
-          vm.docxManager.put(fname, DocxBinEntry(c.img));
+          final rel = docRels.getRel(idAttr);
+          final fname = 'word/${rel.target}';
+          if (vm.docxManager.has(fname)) {
+            vm.docxManager.put(fname, DocxBinEntry(c.img));
+          }
         }
       }
     }
