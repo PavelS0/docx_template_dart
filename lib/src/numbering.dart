@@ -18,9 +18,11 @@ class Numbering {
   int _maxId;
   int _maxAbstractId;
 
-  factory Numbering.from(DocxEntry entry) {
-    final component = Numbering._(entry, entry.doc, XmlCopyVisitor());
-    _fillNumMap(component, entry.doc.rootElement);
+  factory Numbering.from(DocxManager manager) {
+    final DocxXmlEntry xml =
+        manager.getEntry(() => DocxXmlEntry(), 'word/numbering.xml');
+    final component = Numbering._(xml, xml.doc, XmlCopyVisitor());
+    _fillNumMap(component, xml.doc.rootElement);
     return component;
   }
 

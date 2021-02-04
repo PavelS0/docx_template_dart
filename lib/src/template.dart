@@ -5,10 +5,7 @@ import 'docx_entry.dart';
 
 class DocxTemplate {
   DocxTemplate._();
-
-  Archive _arch;
-  DocxEntry _documentEntry;
-  DocxEntry _numberingEntry;
+  DocxManager _manager;
 
   ///
   /// Load Template from byte buffer of docx file
@@ -17,15 +14,7 @@ class DocxTemplate {
     final component = DocxTemplate._();
     final arch = ZipDecoder().decodeBytes(bytes);
 
-    final docEntry = DocxEntry.fromArchive(arch, 'word/document.xml');
-    final numberingEntry = DocxEntry.fromArchive(arch, 'word/numbering.xml');
-    if (docEntry == null) {
-      throw FormatException('Docx have unsupported format');
-    }
-
-    component._documentEntry = docEntry;
-    component._numberingEntry = numberingEntry;
-    component._arch = arch;
+    component._manager = DocxManager(arch);
 
     return component;
   }
@@ -34,14 +23,10 @@ class DocxTemplate {
   /// Generates byte buffer with docx file content by given [c]
   ///
   Future<List<int>> generate(Content c) async {
-    final vm = ViewManager.attach(_documentEntry, _numberingEntry, this);
+    final vm = ViewManager.attach(_manager);
     vm.produce(c);
-    DocxEntry.updateArchive(_arch, _documentEntry);
-    if (_numberingEntry != null) {
-      DocxEntry.updateArchive(_arch, _numberingEntry);
-    }
-
+    _manager.updateArch();
     final enc = ZipEncoder();
-    return enc.encode(_arch);
+    return enc.encode(_manager.arch);
   }
 }

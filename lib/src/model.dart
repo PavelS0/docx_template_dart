@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'dart:typed_data';
+
 ///
 /// Root content element, use method add() to add inner contents
 ///
@@ -83,4 +85,10 @@ class TableContent extends Content {
 
 class RowContent extends Content {
   RowContent([Map<String, Content> cols]) : super("", cols);
+}
+
+class ImageContent extends Content {
+  List<int> img;
+  String filename;
+  ImageContent(String key, this.img) : super(key, {});
 }

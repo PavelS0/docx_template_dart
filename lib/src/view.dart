@@ -35,9 +35,7 @@ class SdtView {
 class View<T extends Content> extends XmlElement {
   Map<String, List<View>> sub;
   final String tag;
-
-  final ViewManager vm;
-  View(this.vm, XmlName name,
+  View(XmlName name,
       [Iterable<XmlAttribute> attributesIterable = const [],
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
@@ -72,7 +70,7 @@ class View<T extends Content> extends XmlElement {
     return views;
   }
 
-  List<XmlElement> produce(T c) {
+  List<XmlElement> produce(ViewManager vm, T c) {
     return [];
   }
 
@@ -107,20 +105,20 @@ class View<T extends Content> extends XmlElement {
 }
 
 class TextView extends View<TextContent> {
-  TextView(ViewManager vm, XmlName name,
+  TextView(XmlName name,
       [Iterable<XmlAttribute> attributesIterable = const [],
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag])
-      : super(vm, name, attributesIterable, children, isSelfClosing, tag);
+      : super(name, attributesIterable, children, isSelfClosing, tag);
 
   @override
-  List<XmlElement> produce(TextContent c) {
+  List<XmlElement> produce(ViewManager vm, TextContent c) {
     XmlElement copy = this.accept(vm._copyVisitor);
     final r = findR(copy);
     if (r != null) {
       _removeRSiblings(r);
-      _updateRText(r, c != null ? c.text : '');
+      _updateRText(vm, r, c != null ? c.text : '');
     }
     return List.from(copy.children);
   }
@@ -131,7 +129,7 @@ class TextView extends View<TextContent> {
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag]) {
-    return TextView(vm, name, attributesIterable, children, isSelfClosing, tag);
+    return TextView(name, attributesIterable, children, isSelfClosing, tag);
   }
 
   XmlElement findR(XmlElement src) =>
@@ -159,7 +157,7 @@ class TextView extends View<TextContent> {
     }
   }
 
-  List<XmlElement> _makeTCopies(XmlElement t, int totalCount) {
+  List<XmlElement> _makeTCopies(ViewManager vm, XmlElement t, int totalCount) {
     final tCopies = <XmlElement>[];
     for (var i = 0; i < totalCount; i++) {
       tCopies.add(t.accept(vm._copyVisitor));
@@ -169,7 +167,7 @@ class TextView extends View<TextContent> {
 
   XmlElement _brElement() => XmlElement(XmlName('br', 'w'));
 
-  void _updateRText(XmlElement r, String text) {
+  void _updateRText(ViewManager vm, XmlElement r, String text) {
     final tIndex =
         r.children.indexWhere((e) => e is XmlElement && e.name.local == 't');
     if (tIndex >= 0) {
@@ -198,14 +196,14 @@ class TextView extends View<TextContent> {
 }
 
 class PlainView extends View<PlainContent> {
-  PlainView(ViewManager vm, XmlName name,
+  PlainView(XmlName name,
       [Iterable<XmlAttribute> attributesIterable = const [],
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag])
-      : super(vm, name, attributesIterable, children, isSelfClosing, tag);
+      : super(name, attributesIterable, children, isSelfClosing, tag);
   @override
-  List<XmlElement> produce(PlainContent c) {
+  List<XmlElement> produce(ViewManager vm, PlainContent c) {
     XmlElement copy = this.accept(vm._copyVisitor);
     var views = View.subViews(copy);
     for (var v in views) {
@@ -220,18 +218,17 @@ class PlainView extends View<PlainContent> {
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag]) {
-    return PlainView(
-        vm, name, attributesIterable, children, isSelfClosing, tag);
+    return PlainView(name, attributesIterable, children, isSelfClosing, tag);
   }
 }
 
 class ListView extends View<ListContent> {
-  ListView(ViewManager vm, XmlName name,
+  ListView(XmlName name,
       [Iterable<XmlAttribute> attributesIterable = const [],
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag])
-      : super(vm, name, attributesIterable, children, isSelfClosing, tag);
+      : super(name, attributesIterable, children, isSelfClosing, tag);
 
   XmlElement _findFirstChild(XmlElement src, String name) => src
           .children.isNotEmpty
@@ -256,7 +253,7 @@ class ListView extends View<ListContent> {
     return null;
   }
 
-  String _getNewNumId(XmlElement list) {
+  String _getNewNumId(ViewManager vm, XmlElement list) {
     final numId = _getNumIdNode(list);
     if (numId != null) {
       final idNode = numId.getAttributeNode('val', namespace: '*');
@@ -280,7 +277,7 @@ class ListView extends View<ListContent> {
   }
 
   @override
-  List<XmlElement> produce(ListContent c) {
+  List<XmlElement> produce(ViewManager vm, ListContent c) {
     List<XmlElement> l = [];
     if (c == null) {
       if (vm._viewStack.length >= 2 && vm._viewStack.elementAt(1) is RowView) {
@@ -315,7 +312,7 @@ class ListView extends View<ListContent> {
       final vs = vm._viewStack;
       String newNumId;
       if (vs.any((element) => element is PlainView || element is RowView)) {
-        newNumId = _getNewNumId(this);
+        newNumId = _getNewNumId(vm, this);
       }
       for (var cont in c.list) {
         XmlElement copy = this.accept(vm._copyVisitor);
@@ -343,20 +340,20 @@ class ListView extends View<ListContent> {
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag]) {
-    return ListView(vm, name, attributesIterable, children, isSelfClosing, tag);
+    return ListView(name, attributesIterable, children, isSelfClosing, tag);
   }
 }
 
 class RowView extends View<TableContent> {
-  RowView(ViewManager vm, XmlName name,
+  RowView(XmlName name,
       [Iterable<XmlAttribute> attributesIterable = const [],
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag])
-      : super(vm, name, attributesIterable, children, isSelfClosing, tag);
+      : super(name, attributesIterable, children, isSelfClosing, tag);
 
   @override
-  List<XmlElement> produce(TableContent c) {
+  List<XmlElement> produce(ViewManager vm, TableContent c) {
     List<XmlElement> l = [];
 
     if (c == null) {
@@ -383,6 +380,66 @@ class RowView extends View<TableContent> {
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag]) {
-    return RowView(vm, name, attributesIterable, children, isSelfClosing, tag);
+    return RowView(name, attributesIterable, children, isSelfClosing, tag);
+  }
+}
+
+class ImgView extends View<ImageContent> {
+  ImgView(XmlName name,
+      [Iterable<XmlAttribute> attributesIterable = const [],
+      Iterable<XmlNode> children = const [],
+      bool isSelfClosing = true,
+      String tag])
+      : super(name, attributesIterable, children, isSelfClosing, tag);
+
+  String _getExt(String file) {
+    final dotPos = file.lastIndexOf('.');
+    if (dotPos > 0) {
+      return file.substring(dotPos + 1);
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  List<XmlElement> produce(ViewManager vm, ImageContent c) {
+    List<XmlElement> l = [];
+    XmlElement copy = this.accept(vm._copyVisitor);
+    l = List.from(copy.children);
+    if (c != null) {
+      final pr = copy.descendants.firstWhere(
+          (e) => e is XmlElement && e.name.local == 'docPr',
+          orElse: () => null);
+      if (pr != null) {
+        final idAttr = pr.getAttribute('id');
+        final descrAttr = pr.getAttribute('descr');
+        String ext = _getExt(descrAttr);
+        if (ext == null) {
+          ext = 'jpeg';
+        }
+
+        final docRels = vm.docxManager
+            .getEntry(() => DocxXmlEntry(), 'word/_rels/document.xml.rels');
+        final fname = 'word/media/image$idAttr.$ext';
+
+        if (docRels != null) {
+          final rels = docRels.doc.rootElement;
+        }
+
+        if (vm.docxManager.has(fname)) {
+          vm.docxManager.put(fname, DocxBinEntry(c.img));
+        }
+      }
+    }
+    return l;
+  }
+
+  @override
+  RowView createNew(XmlName name,
+      [Iterable<XmlAttribute> attributesIterable = const [],
+      Iterable<XmlNode> children = const [],
+      bool isSelfClosing = true,
+      String tag]) {
+    return RowView(name, attributesIterable, children, isSelfClosing, tag);
   }
 }

@@ -12,22 +12,20 @@ part 'numbering.dart';
 
 class ViewManager {
   final XmlCopyVisitor _copyVisitor = XmlCopyVisitor();
-  final DocxTemplate t;
   final View root;
+  final DocxManager docxManager;
   final Numbering numbering;
 
   Queue<View> _viewStack = Queue();
-  ViewManager._(this.t, this.root, this.numbering);
+  ViewManager._(this.root, this.numbering, this.docxManager);
 
-  factory ViewManager.attach(
-      DocxEntry documentEntry, DocxEntry numberingEntry, DocxTemplate t) {
-    final root = View(null, XmlName('root'));
-    Numbering numbering;
-    if (numberingEntry != null) {
-      numbering = Numbering.from(numberingEntry);
-    }
-    ViewManager vm = ViewManager._(t, root, numbering);
-    vm._init(documentEntry.doc.rootElement, root);
+  factory ViewManager.attach(DocxManager docxMan) {
+    final root = View(XmlName('root'));
+    final numbering = Numbering.from(docxMan);
+    ViewManager vm = ViewManager._(root, numbering, docxMan);
+    final xmlEntry =
+        docxMan.getEntry(() => DocxXmlEntry(), 'word/document.xml');
+    vm._init(xmlEntry.doc.rootElement, root);
 
     return vm;
   }
@@ -52,54 +50,26 @@ class ViewManager {
     sdtParent.children.insert(sdtIndex, v);
   }
 
-  View _initTable(SdtView sdtView) {
-    final childs = sdtView.content.children.toList();
-    sdtView.content.children.clear();
-    RowView tabv =
-        RowView(this, XmlName("table"), [], childs, false, sdtView.name);
-    return tabv;
-  }
-
-  View _initPlain(SdtView sdtView) {
-    var childs = sdtView.content.children.toList();
-    sdtView.content.children.clear();
-    PlainView pv =
-        PlainView(this, XmlName("plain"), [], childs, false, sdtView.name);
-    return pv;
-  }
-
-  View _initText(SdtView sdtView) {
-    var childs = sdtView.content.children.toList();
-    sdtView.content.children.clear();
-    TextView tv =
-        TextView(this, XmlName("text"), [], childs, false, sdtView.name);
-    return tv;
-  }
-
-  View _initList(SdtView sdtView) {
-    var childs = sdtView.content.children.toList();
-    sdtView.content.children.clear();
-    ListView lv =
-        ListView(this, XmlName("list"), [], childs, false, sdtView.name);
-    return lv;
-  }
-
   View _initView(SdtView sdtView, View parent) {
     View v;
-    final sdt = sdtView.sdt;
+    final sdtChilds = sdtView.content.children.toList();
+    sdtView.content.children.clear();
 
     switch (sdtView.tag) {
       case "table":
-        v = _initTable(sdtView);
+        v = RowView(XmlName("table"), [], sdtChilds, false, sdtView.name);
         break;
       case "plain":
-        v = _initPlain(sdtView);
+        v = PlainView(XmlName("plain"), [], sdtChilds, false, sdtView.name);
         break;
       case "text":
-        v = _initText(sdtView);
+        v = TextView(XmlName("text"), [], sdtChilds, false, sdtView.name);
         break;
       case "list":
-        v = _initList(sdtView);
+        v = ListView(XmlName("list"), [], sdtChilds, false, sdtView.name);
+        break;
+      case "img":
+        v = ImgView(XmlName("img"), [], sdtChilds, false, sdtView.name);
         break;
     }
     if (v != null) {
@@ -131,11 +101,11 @@ class ViewManager {
     _viewStack.addFirst(v);
     List<XmlElement> produced;
     if (c != null && c.containsKey(v.tag)) {
-      produced = v.produce(c[v.tag]);
+      produced = v.produce(this, c[v.tag]);
     } else if (c != null && c.key == v.tag) {
-      produced = v.produce(c);
+      produced = v.produce(this, c);
     } else {
-      produced = v.produce(null);
+      produced = v.produce(this, null);
     }
     View.replaceWithAll(v, produced, true);
     _viewStack.removeFirst();
