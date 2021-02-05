@@ -21,3 +21,7 @@
 
 ## 0.2.4
 - Added support for multiline strings
+
+## 0.2.5
+- Added partial support for inserting images (NOTE: Only in NON repeated fields, not work in tables, lists)
+- Refactoring DocxEntry classes

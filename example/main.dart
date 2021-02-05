@@ -10,6 +10,9 @@ void main() async {
   final f = File("template.docx");
   final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
 
+  // Load test image for inserting in docx
+  final testFileContent = await File('test.jpg').readAsBytes();
+
   Content c = Content();
   c
     ..add(TextContent("docname", "Simple docname"))
@@ -77,7 +80,9 @@ void main() async {
       PlainContent("multilinePlain")
         ..add(TextContent('multilineText', 'line 3'))
     ]))
-    ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'));
+    ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
+    ..add(ImageContent('img', testFileContent));
+  ;
 
   final d = await docx.generate(c);
   final of = File('generated.docx');
