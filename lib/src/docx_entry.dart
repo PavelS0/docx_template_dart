@@ -68,7 +68,20 @@ class DocxRel {
 class DocxRelsEntry extends DocxXmlEntry {
   DocxRelsEntry();
 
-  getRel(String id) {}
+  DocxRel getRel(String id) {
+    final root = doc.rootElement;
+    final el = root.descendants.firstWhere(
+        (e) =>
+            e is XmlElement &&
+            e.name.local == 'Relationship' &&
+            e.getAttribute('Id') == id,
+        orElse: () => null);
+    if (el != null) {
+      return DocxRel(id, el.getAttribute('Type'), el.getAttribute('Target'));
+    } else {
+      return null;
+    }
+  }
 
   @override
   void _load(Archive arch, String entryName) {
