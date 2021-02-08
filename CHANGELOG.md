@@ -28,3 +28,6 @@
 
 ## 0.2.6
 - Fixed The getter 'rootElement' was called on null 
+
+## 0.2.7
+- Added support for getiing image from relationship file by id
