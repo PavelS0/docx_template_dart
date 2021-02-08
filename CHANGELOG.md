@@ -25,3 +25,6 @@
 ## 0.2.5
 - Added partial support for inserting images (NOTE: Only in NON repeated fields, not work in tables, lists)
 - Refactoring DocxEntry classes
+
+## 0.2.6
+- Fixed The getter 'rootElement' was called on null 

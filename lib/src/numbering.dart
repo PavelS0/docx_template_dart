@@ -21,9 +21,13 @@ class Numbering {
   factory Numbering.from(DocxManager manager) {
     final DocxXmlEntry xml =
         manager.getEntry(() => DocxXmlEntry(), 'word/numbering.xml');
-    final component = Numbering._(xml, xml.doc, XmlCopyVisitor());
-    _fillNumMap(component, xml.doc.rootElement);
-    return component;
+    if (xml.doc != null) {
+      final component = Numbering._(xml, xml.doc, XmlCopyVisitor());
+      _fillNumMap(component, xml.doc.rootElement);
+      return component;
+    } else {
+      return null;
+    }
   }
 
   bool get isModifed => _modified;
