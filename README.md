@@ -8,9 +8,18 @@ Then, Go to the Developer tab and enable Design Mode. Tags will appear, then cli
 # Example
 
 ```
-  // or in the case of Flutter, you can use rootBundle.load, then get bytes
+  
   final f = File("template.docx");
   final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
+
+  /* 
+    Or in the case of Flutter, you can use rootBundle.load, then get bytes
+    
+    final data = await rootBundle.load('lib/assets/users.docx');
+    final bytes = data.buffer.asUint8List();
+
+    final docx = await DocxTemplate.fromBytes(bytes);
+  */
 
   // Load test image for inserting in docx
   final testFileContent = await File('test.jpg').readAsBytes();

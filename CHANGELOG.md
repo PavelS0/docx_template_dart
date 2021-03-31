@@ -31,3 +31,6 @@
 
 ## 0.2.7
 - Added support for getiing image from relationship file by id
+
+## 0.2.8
+- Added support for displaying images in a table

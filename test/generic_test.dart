@@ -16,7 +16,8 @@ void main() {
         RowContent()
           ..add(TextContent("key1", "Paul"))
           ..add(TextContent("key2", "Viberg"))
-          ..add(TextContent("key3", "Engineer")),
+          ..add(TextContent("key3", "Engineer"))
+          ..add(ImageContent('img', testFileContent)),
         RowContent()
           ..add(TextContent("key1", "Alex"))
           ..add(TextContent("key2", "Houser"))
@@ -25,6 +26,7 @@ void main() {
             TextContent("value", "Mercedes-Benz C-Class S205"),
             TextContent("value", "Lexus LX 570")
           ]))
+          ..add(ImageContent('img', testFileContent))
       ]))
       ..add(ListContent("list", [
         TextContent("value", "Engine")

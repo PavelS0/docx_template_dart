@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'package:docx_template/docx_template.dart';
 import 'package:docx_template/src/docx_entry.dart';
 import 'package:xml/xml.dart';
+import 'package:path/path.dart' as path;
 
 part 'view.dart';
 part 'visitor.dart';

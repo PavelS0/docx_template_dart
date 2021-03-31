@@ -62,15 +62,26 @@ class DocxRel {
   DocxRel(this.id, this.type, this.target);
   final String id;
   final String type;
-  final String target;
+  String target;
 }
 
 class DocxRelsEntry extends DocxXmlEntry {
   DocxRelsEntry();
+  XmlElement _rels;
+  int _id = 1000;
+  int _imageId = 1000;
+
+  String nextId() {
+    _id++;
+    return 'rId$_id';
+  }
+
+  String nextImageId() {
+    return (_imageId++).toString();
+  }
 
   DocxRel getRel(String id) {
-    final root = doc.rootElement;
-    final el = root.descendants.firstWhere(
+    final el = _rels.descendants.firstWhere(
         (e) =>
             e is XmlElement &&
             e.name.local == 'Relationship' &&
@@ -83,9 +94,26 @@ class DocxRelsEntry extends DocxXmlEntry {
     }
   }
 
+  void add(String id, DocxRel rel) {
+    final n = _newRel(DocxRel(id, rel.type, rel.target));
+    _rels.children.add(n);
+  }
+
+  XmlElement _newRel(DocxRel rel) {
+    final r = XmlElement(XmlName('Relationship'));
+    r.attributes
+      ..add(XmlAttribute(XmlName('Id'), rel.id))
+      ..add(XmlAttribute(XmlName('Type'), rel.type))
+      ..add(XmlAttribute(XmlName('Target'), rel.target));
+    return r;
+  }
+
+  /* <Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image2.jpeg"/> */
+
   @override
   void _load(Archive arch, String entryName) {
     super._load(arch, entryName);
+    _rels = doc.rootElement;
   }
 }
 

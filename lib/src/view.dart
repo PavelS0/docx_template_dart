@@ -392,15 +392,6 @@ class ImgView extends View<ImageContent> {
       String tag])
       : super(name, attributesIterable, children, isSelfClosing, tag);
 
-  String _getExt(String file) {
-    final dotPos = file.lastIndexOf('.');
-    if (dotPos > 0) {
-      return file.substring(dotPos + 1);
-    } else {
-      return null;
-    }
-  }
-
   @override
   List<XmlElement> produce(ViewManager vm, ImageContent c) {
     List<XmlElement> l = [];
@@ -417,9 +408,17 @@ class ImgView extends View<ImageContent> {
             .getEntry(() => DocxRelsEntry(), 'word/_rels/document.xml.rels');
         if (docRels != null) {
           final rel = docRels.getRel(idAttr);
-          final fname = 'word/${rel.target}';
-          if (vm.docxManager.has(fname)) {
-            vm.docxManager.put(fname, DocxBinEntry(c.img));
+          if (rel != null) {
+            final base = path.basename(rel.target);
+            final ext = path.extension(base);
+            final imageId = docRels.nextImageId();
+            rel.target =
+                path.join(path.dirname(rel.target), 'image$imageId$ext');
+            final imagePath = 'word/${rel.target}';
+            final relId = docRels.nextId();
+            pr.setAttribute('r:embed', relId);
+            docRels.add(relId, rel);
+            vm.docxManager.add(imagePath, DocxBinEntry(c.img));
           }
         }
       }
@@ -428,11 +427,11 @@ class ImgView extends View<ImageContent> {
   }
 
   @override
-  RowView createNew(XmlName name,
+  ImgView createNew(XmlName name,
       [Iterable<XmlAttribute> attributesIterable = const [],
       Iterable<XmlNode> children = const [],
       bool isSelfClosing = true,
       String tag]) {
-    return RowView(name, attributesIterable, children, isSelfClosing, tag);
+    return ImgView(name, attributesIterable, children, isSelfClosing, tag);
   }
 }
