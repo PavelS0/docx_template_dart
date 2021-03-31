@@ -42,8 +42,14 @@ void main() async {
     ]))
     ..add(ListContent("list", [
       TextContent("value", "Engine")
-        ..add(ListContent("listnested",
-            [TextContent("value", "BMW M30"), TextContent("value", "2GZ GE")])),
+        ..add(ListContent("listnested", [
+          PlainContent("value")
+            ..add(TextContent("normal", "BMW MTech"))
+            ..add(TextContent("bold", "S55")),
+          PlainContent("value")
+            ..add(TextContent("normal", "BMW"))
+            ..add(TextContent("bold", "N55")),
+        ])),
       TextContent("value", "Gearbox"),
       TextContent("value", "Chassis")
     ]))
