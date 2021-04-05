@@ -58,19 +58,24 @@ class ViewManager {
 
     switch (sdtView.tag) {
       case "table":
-        v = RowView(XmlName("table"), [], sdtChilds, false, sdtView.name);
+        v = RowView(
+            XmlName("table"), [], sdtChilds, false, sdtView.name, sdtView);
         break;
       case "plain":
-        v = PlainView(XmlName("plain"), [], sdtChilds, false, sdtView.name);
+        v = PlainView(
+            XmlName("plain"), [], sdtChilds, false, sdtView.name, sdtView);
         break;
       case "text":
-        v = TextView(XmlName("text"), [], sdtChilds, false, sdtView.name);
+        v = TextView(
+            XmlName("text"), [], sdtChilds, false, sdtView.name, sdtView);
         break;
       case "list":
-        v = ListView(XmlName("list"), [], sdtChilds, false, sdtView.name);
+        v = ListView(
+            XmlName("list"), [], sdtChilds, false, sdtView.name, sdtView);
         break;
       case "img":
-        v = ImgView(XmlName("img"), [], sdtChilds, false, sdtView.name);
+        v = ImgView(
+            XmlName("img"), [], sdtChilds, false, sdtView.name, sdtView);
         break;
     }
     if (v != null) {
@@ -101,6 +106,7 @@ class ViewManager {
   List<XmlElement> _produceInner(Content c, View v) {
     _viewStack.addFirst(v);
     List<XmlElement> produced;
+
     if (c != null && c.containsKey(v.tag)) {
       produced = v.produce(this, c[v.tag]);
     } else if (c != null && c.key == v.tag) {
@@ -108,7 +114,9 @@ class ViewManager {
     } else {
       produced = v.produce(this, null);
     }
+
     View.replaceWithAll(v, produced, true);
+
     _viewStack.removeFirst();
     return produced;
   }

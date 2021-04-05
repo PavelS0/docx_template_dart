@@ -8,6 +8,22 @@ void main() {
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
 
     final testFileContent = await File('test.jpg').readAsBytes();
+
+    final listNormal = ['Foo', 'Bar', 'Baz'];
+    final listBold = ['ooF', 'raB', 'zaB'];
+
+    final contentList = <Content>[];
+
+    final b = listBold.iterator;
+    for (var n in listNormal) {
+      b.moveNext();
+
+      final c = PlainContent("value")
+        ..add(TextContent("normal", n))
+        ..add(TextContent("bold", b.current));
+      contentList.add(c);
+    }
+
     Content c = Content();
     c
       ..add(TextContent("docname", "Simple docname"))
@@ -30,14 +46,7 @@ void main() {
       ]))
       ..add(ListContent("list", [
         TextContent("value", "Engine")
-          ..add(ListContent("listnested", [
-            PlainContent("value")
-              ..add(TextContent("normal", "BMW MTech"))
-              ..add(TextContent("bold", "S55")),
-            PlainContent("value")
-              ..add(TextContent("normal", "BMW"))
-              ..add(TextContent("bold", "N55")),
-          ])),
+          ..add(ListContent("listnested", contentList)),
         TextContent("value", "Gearbox"),
         TextContent("value", "Chassis")
       ]))

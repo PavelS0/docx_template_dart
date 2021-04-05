@@ -31,7 +31,7 @@ class XmlCopyVisitor with XmlVisitor {
   XmlElement visitElement(XmlElement node) {
     if (node is View) {
       return node.createNew(visit(node.name), node.attributes.map(visit),
-          node.children.map(visit), node.isSelfClosing, node.tag);
+          node.children.map(visit), node.isSelfClosing, node.tag, node.sdtView);
     } else {
       return XmlElement(visit(node.name), node.attributes.map(visit),
           node.children.map(visit), node.isSelfClosing);

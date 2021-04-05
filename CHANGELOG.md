@@ -34,3 +34,6 @@
 
 ## 0.2.8
 - Added support for displaying images in a table
+
+## 0.2.9
+- Original Content in the text tag now is not deleted if Content or Content.text is null
