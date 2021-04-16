@@ -37,3 +37,7 @@
 
 ## 0.2.9
 - Original Content in the text tag now is not deleted if Content or Content.text is null
+
+## 0.2.10
+- Added options in DocxTemplate.generate, allowing save sdt tags
+- XML copy optimizations 

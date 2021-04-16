@@ -3,6 +3,17 @@ import 'package:docx_template/src/model.dart';
 import 'package:docx_template/src/view_manager.dart';
 import 'docx_entry.dart';
 
+///
+/// Sdt tags policy enum
+///
+/// [removeAll] - remove all sdt tags from document
+///
+/// [saveNullified] - save ONLY tags where [Content] is null
+///
+/// [saveText] - save ALL TextContent field (include nullifed [Content])
+///
+enum TagPolicy { removeAll, saveNullified, saveText }
+
 class DocxTemplate {
   DocxTemplate._();
   DocxManager _manager;
@@ -22,8 +33,9 @@ class DocxTemplate {
   ///
   /// Generates byte buffer with docx file content by given [c]
   ///
-  Future<List<int>> generate(Content c) async {
-    final vm = ViewManager.attach(_manager);
+  Future<List<int>> generate(Content c,
+      {TagPolicy tagPolicy = TagPolicy.saveText}) async {
+    final vm = ViewManager.attach(_manager, tagPolicy: tagPolicy);
     vm.produce(c);
     _manager.updateArch();
     final enc = ZipEncoder();
