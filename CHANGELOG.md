@@ -41,3 +41,6 @@
 ## 0.2.10
 - Added options in DocxTemplate.generate, allowing save sdt tags
 - XML copy optimizations 
+
+## 0.3.0-nullsafety
+- Pre-release of nullsafity version

@@ -1,6 +1,6 @@
 name: docx_template
 description: A Docx template engine.
-version: 0.3.0
+version: 0.3.0-nullsafety
 homepage: https://github.com/PavelS0/docx_template_dart
 environment:
   sdk: '>=2.12.0 <3.0.0'
