@@ -97,5 +97,5 @@ Then, Go to the Developer tab and enable Design Mode. Tags will appear, then cli
       ..add(ImageContent('img', testFileContent));
   final d = await docx.generate(c);
   final of = File('generated.docx');
-  await of.writeAsBytes(d);
+  if (d != null) await of.writeAsBytes(d);
 ```

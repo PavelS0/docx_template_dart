@@ -98,6 +98,6 @@ void main() {
 
     final d = await docx.generate(c, tagPolicy: TagPolicy.saveNullified);
     final of = File('generated.docx');
-    await of.writeAsBytes(d);
+    if (d != null) await of.writeAsBytes(d);
   });
 }

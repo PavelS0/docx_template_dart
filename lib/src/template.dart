@@ -16,7 +16,7 @@ enum TagPolicy { removeAll, saveNullified, saveText }
 
 class DocxTemplate {
   DocxTemplate._();
-  DocxManager _manager;
+  late DocxManager _manager;
 
   ///
   /// Load Template from byte buffer of docx file
@@ -33,7 +33,7 @@ class DocxTemplate {
   ///
   /// Generates byte buffer with docx file content by given [c]
   ///
-  Future<List<int>> generate(Content c,
+  Future<List<int>?> generate(Content c,
       {TagPolicy tagPolicy = TagPolicy.saveText}) async {
     final vm = ViewManager.attach(_manager, tagPolicy: tagPolicy);
     vm.produce(c);

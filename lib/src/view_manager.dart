@@ -7,6 +7,7 @@ import 'package:docx_template/src/docx_entry.dart';
 import 'package:docx_template/src/template.dart';
 import 'package:xml/xml.dart';
 import 'package:path/path.dart' as path;
+import 'package:collection/collection.dart' show IterableExtension;
 
 part 'view.dart';
 part 'visitor.dart';
@@ -15,7 +16,7 @@ part 'numbering.dart';
 class ViewManager {
   final View root;
   final DocxManager docxManager;
-  final Numbering numbering;
+  final Numbering? numbering;
   final TagPolicy tagPolicy;
   int _sdtId = 5120000;
 
@@ -26,12 +27,14 @@ class ViewManager {
 
   factory ViewManager.attach(DocxManager docxMan,
       {TagPolicy tagPolicy = TagPolicy.saveText}) {
-    final root = View(XmlName('root'), const [], const [], false, '', null, []);
+    final root =
+        View(XmlName('root'), const [], const [], false, '', null, [], null);
     final numbering = Numbering.from(docxMan);
+
     ViewManager vm = ViewManager._(root, numbering, docxMan, tagPolicy);
     final xmlEntry =
-        docxMan.getEntry(() => DocxXmlEntry(), 'word/document.xml');
-    vm._init(xmlEntry.doc.rootElement, root);
+        docxMan.getEntry(() => DocxXmlEntry(), 'word/document.xml')!;
+    vm._init(xmlEntry.doc!.rootElement, root);
 
     return vm;
   }
@@ -48,17 +51,9 @@ class ViewManager {
     });
   }
 
-  void _replaceSdtWithView(SdtView sdtView, View v) {
-    final sdt = sdtView.sdt;
-    var sdtParent = sdt.parent;
-    var sdtIndex = sdtParent.children.indexOf(sdtView.sdt);
-    sdtParent.children.remove(sdt);
-    sdtParent.children.insert(sdtIndex, v);
-  }
-
-  View _initView(SdtView sdtView, View parent) {
-    View v;
-    final sdtParent = sdtView.sdt.parent;
+  View? _initView(SdtView sdtView, View parent) {
+    View? v;
+    final sdtParent = sdtView.sdt.parent!;
     final sdtIndex = sdtParent.children.indexOf(sdtView.sdt);
     final sdtChilds = sdtView.content.children.toList();
     sdtParent.children.removeAt(sdtIndex);
@@ -93,10 +88,10 @@ class ViewManager {
       if (parent.sub == null) {
         parent.sub = {};
       }
-      final sub = parent.sub;
+      final sub = parent.sub!;
 
       if (sub.containsKey(sdtView.name)) {
-        sub[sdtView.name].add(v);
+        sub[sdtView.name]!.add(v);
       } else {
         sub[sdtView.name] = [v];
       }
@@ -105,24 +100,26 @@ class ViewManager {
   }
 
   void replaceWithAll(XmlElement elem, List<XmlElement> to, bool clearParents,
-      {SdtView insertBetween}) {
+      {SdtView? insertBetween}) {
     if (clearParents) {
       for (XmlElement e in to) {
         if (e.parent != null) {
-          e.parent.children.remove(e);
+          e.parent!.children.remove(e);
         }
       }
     }
-    SdtView sdtViewCp;
+    SdtView? sdtViewCp;
     if (insertBetween != null) {
       final copy = insertBetween.sdt.accept(XmlCopyVisitor());
       sdtViewCp = SdtView.parse(copy);
-      sdtViewCp.id = sdtId;
-      sdtViewCp.content.children.addAll(to);
+      if (sdtViewCp != null) {
+        sdtViewCp.id = sdtId;
+        sdtViewCp.content.children.addAll(to);
+      }
     }
     if (elem.parent != null) {
       // Root elem not have parents
-      var childs = elem.parent.children;
+      var childs = elem.parent!.children;
       var index = childs.indexOf(elem);
       childs.removeAt(index);
       if (sdtViewCp != null) {
@@ -134,14 +131,14 @@ class ViewManager {
   }
 
   produce(Content c) {
-    for (var key in root.sub.keys) {
-      for (var v in root.sub[key]) {
+    for (var key in root.sub!.keys) {
+      for (var v in root.sub![key]!) {
         _produceInner(c, v);
       }
     }
   }
 
-  List<XmlElement> _produceInner(Content c, View v) {
+  List<XmlElement> _produceInner(Content? c, View v) {
     _viewStack.addFirst(v);
     List<XmlElement> produced;
 
@@ -153,7 +150,7 @@ class ViewManager {
       produced = v.produce(this, null);
     }
 
-    SdtView insertV;
+    SdtView? insertV;
     switch (tagPolicy) {
       case TagPolicy.saveNullified:
         if ((c != null && !c.containsKey(v.tag) && c.key != v.tag) ||

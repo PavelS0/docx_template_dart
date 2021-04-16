@@ -103,5 +103,5 @@ void main() async {
 
   final d = await docx.generate(c);
   final of = File('generated.docx');
-  await of.writeAsBytes(d);
+  if (d != null) await of.writeAsBytes(d);
 }
