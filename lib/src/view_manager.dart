@@ -12,6 +12,7 @@ import 'package:collection/collection.dart' show IterableExtension;
 part 'view.dart';
 part 'visitor.dart';
 part 'numbering.dart';
+part 'std_view.dart';
 
 class ViewManager {
   final View root;
@@ -40,15 +41,29 @@ class ViewManager {
   }
 
   void _init(XmlElement node, View parent) {
-    View.traverse(node, (n) => n.name.local == "sdt", (e) {
-      var sdtV = SdtView.parse(e);
-      if (sdtV != null) {
-        var v = _initView(sdtV, parent);
-        if (v != null) {
-          _init(v, v);
-        }
+    /*  final sdtTree = SdtView.getTree(node);
+    SdtView.traverseTree(sdtTree, (sdtE, sdtPar) {
+      var v = _initView(sdtE, parent);
+      if (v != null) {
+        _init(v, v);
       }
     });
+ */
+    final l = node.children.length;
+    for (var i = 0; i < l; i++) {
+      final c = node.children[i];
+      if (c is XmlElement) {
+        if (c.name.local == "sdt") {
+          var sdtV = SdtView.parse(c);
+          if (sdtV != null) {
+            var v = _initView(sdtV, parent);
+            if (v != null) _init(v, v);
+          }
+        } else {
+          _init(c, parent);
+        }
+      }
+    }
   }
 
   View? _initView(SdtView sdtView, View parent) {
@@ -131,9 +146,12 @@ class ViewManager {
   }
 
   produce(Content c) {
-    for (var key in root.sub!.keys) {
-      for (var v in root.sub![key]!) {
-        _produceInner(c, v);
+    var sub = root.sub;
+    if (sub != null) {
+      for (var key in sub.keys) {
+        for (var v in sub[key]!) {
+          _produceInner(c, v);
+        }
       }
     }
   }

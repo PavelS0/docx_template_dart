@@ -44,3 +44,7 @@
 
 ## 0.3.0-nullsafety
 - Pre-release of nullsafity version
+
+## 0.3.0
+- Attempt to fix concurrent modification
+

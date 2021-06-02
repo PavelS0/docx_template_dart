@@ -3,51 +3,6 @@ part of docx_view;
 typedef bool Check(XmlElement n);
 typedef void OnFound(XmlElement e);
 
-class SdtView {
-  final String tag;
-  final String name;
-  final XmlElement content;
-  final XmlElement sdt;
-  final XmlAttribute _idVal;
-
-  set id(int n) {
-    _idVal.value = n.toString();
-  }
-
-  SdtView(this.tag, this.name, this.content, this.sdt, this._idVal);
-
-  static XmlElement? firstChild(XmlElement e, String name) {
-    return e.children.firstWhereOrNull(
-        (test) => test is XmlElement && test.name.local == name) as XmlElement?;
-  }
-
-  static SdtView? parse(XmlElement e) {
-    if (e.name.local == "sdt") {
-      final sdt = e;
-      final sdtPr = firstChild(sdt, "sdtPr");
-      if (sdtPr != null) {
-        final alias = firstChild(sdtPr, "alias");
-        final tag = firstChild(sdtPr, "tag");
-        final id = firstChild(sdtPr, "id");
-        if (alias != null && tag != null && id != null) {
-          final idVal = View._findAttr(id, "val");
-
-          final content = firstChild(sdt, "sdtContent");
-          if (content != null) {
-            final aliasAttr = View._findAttr(alias, "val");
-            final tagAttr = View._findAttr(tag, "val");
-            if (aliasAttr != null && tagAttr != null && idVal != null) {
-              return SdtView(
-                  tagAttr.value, aliasAttr.value, content, sdt, idVal);
-            }
-          }
-        }
-      }
-    }
-    return null;
-  }
-}
-
 class View<T extends Content?> extends XmlElement {
   Map<String, List<View>>? sub;
   final SdtView? sdtView;
@@ -76,20 +31,6 @@ class View<T extends Content?> extends XmlElement {
       View? parentView) {
     return View(name, attributesIterable, children, isSelfClosing, tag, sdtView,
         childrensView, parentView);
-  }
-
-  static traverse(XmlElement node, Check check, OnFound onFound) {
-    if (node.children.isNotEmpty) {
-      for (var c in node.children) {
-        if (c is XmlElement) {
-          if (check(c)) {
-            onFound(c);
-          } else {
-            traverse(c, check, onFound);
-          }
-        }
-      }
-    }
   }
 
   List<XmlElement> produce(ViewManager vm, T c) {
