@@ -48,3 +48,6 @@
 ## 0.3.0
 - Attempt to fix concurrent modification
 
+## 0.3.1
+- Fixed broken TagPolicy export
+- Unrecognized tags are no longer deleted

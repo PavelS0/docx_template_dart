@@ -67,50 +67,55 @@ class ViewManager {
   }
 
   View? _initView(SdtView sdtView, View parent) {
+    const tags = ["table", "plain", "text", "list", "img"];
     View? v;
-    final sdtParent = sdtView.sdt.parent!;
-    final sdtIndex = sdtParent.children.indexOf(sdtView.sdt);
-    final sdtChilds = sdtView.content.children.toList();
-    sdtParent.children.removeAt(sdtIndex);
-    sdtView.content.children.clear();
+    if (tags.contains(sdtView.tag)) {
+      final sdtParent = sdtView.sdt.parent!;
+      final sdtIndex = sdtParent.children.indexOf(sdtView.sdt);
+      final sdtChilds = sdtView.content.children.toList();
+      sdtParent.children.removeAt(sdtIndex);
+      sdtView.content.children.clear();
 
-    switch (sdtView.tag) {
-      case "table":
-        v = RowView(XmlName("table"), [], sdtChilds, false, sdtView.name,
-            sdtView, [], parent);
-        break;
-      case "plain":
-        v = PlainView(XmlName("plain"), [], sdtChilds, false, sdtView.name,
-            sdtView, [], parent);
-        break;
-      case "text":
-        v = TextView(XmlName("text"), [], sdtChilds, false, sdtView.name,
-            sdtView, [], parent);
-        break;
-      case "list":
-        v = ListView(XmlName("list"), [], sdtChilds, false, sdtView.name,
-            sdtView, [], parent);
-        break;
-      case "img":
-        v = ImgView(XmlName("img"), [], sdtChilds, false, sdtView.name, sdtView,
-            [], parent);
-        break;
-    }
-    if (v != null) {
-      parent.childrensView.add(v);
-      sdtParent.children.insert(sdtIndex, v);
-
-      if (parent.sub == null) {
-        parent.sub = {};
+      switch (sdtView.tag) {
+        case "table":
+          v = RowView(XmlName("table"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "plain":
+          v = PlainView(XmlName("plain"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "text":
+          v = TextView(XmlName("text"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "list":
+          v = ListView(XmlName("list"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "img":
+          v = ImgView(XmlName("img"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
       }
-      final sub = parent.sub!;
 
-      if (sub.containsKey(sdtView.name)) {
-        sub[sdtView.name]!.add(v);
-      } else {
-        sub[sdtView.name] = [v];
+      if (v != null) {
+        parent.childrensView.add(v);
+        sdtParent.children.insert(sdtIndex, v);
+
+        if (parent.sub == null) {
+          parent.sub = {};
+        }
+        final sub = parent.sub!;
+
+        if (sub.containsKey(sdtView.name)) {
+          sub[sdtView.name]!.add(v);
+        } else {
+          sub[sdtView.name] = [v];
+        }
       }
     }
+
     return v;
   }
 

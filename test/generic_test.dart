@@ -96,8 +96,20 @@ void main() {
       ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
       ..add(ImageContent('img', testFileContent));
 
-    final d = await docx.generate(c, tagPolicy: TagPolicy.saveNullified);
-    final of = File('generated.docx');
-    if (d != null) await of.writeAsBytes(d);
+/*     {
+      final d = await docx.generate(c);
+      final of = File('generated.docx');
+      if (d != null) await of.writeAsBytes(d);
+    } */
+    /*   {
+      final d = await docx.generate(c, tagPolicy: TagPolicy.saveNullified);
+      final of = File('generated_saveNullified.docx');
+      if (d != null) await of.writeAsBytes(d);
+    } */
+    {
+      final d = await docx.generate(c, tagPolicy: TagPolicy.removeAll);
+      final of = File('generated_all.docx');
+      if (d != null) await of.writeAsBytes(d);
+    }
   });
 }

@@ -3,6 +3,15 @@ import 'package:docx_template/src/model.dart';
 import 'package:docx_template/src/view_manager.dart';
 import 'docx_entry.dart';
 
+class DocxTemplateException implements Exception {
+  final String message;
+
+  DocxTemplateException(this.message);
+
+  @override
+  String toString() => this.message;
+}
+
 ///
 /// Sdt tags policy enum
 ///
