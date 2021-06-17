@@ -51,3 +51,7 @@
 ## 0.3.1
 - Fixed broken TagPolicy export
 - Unrecognized tags are no longer deleted
+
+## 0.3.2
+- Fixed example
+- updated readme
