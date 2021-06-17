@@ -3,6 +3,15 @@ import 'package:docx_template/src/model.dart';
 import 'package:docx_template/src/view_manager.dart';
 import 'docx_entry.dart';
 
+class DocxTemplateException implements Exception {
+  final String message;
+
+  DocxTemplateException(this.message);
+
+  @override
+  String toString() => this.message;
+}
+
 ///
 /// Sdt tags policy enum
 ///
@@ -16,7 +25,7 @@ enum TagPolicy { removeAll, saveNullified, saveText }
 
 class DocxTemplate {
   DocxTemplate._();
-  DocxManager _manager;
+  late DocxManager _manager;
 
   ///
   /// Load Template from byte buffer of docx file
@@ -33,7 +42,7 @@ class DocxTemplate {
   ///
   /// Generates byte buffer with docx file content by given [c]
   ///
-  Future<List<int>> generate(Content c,
+  Future<List<int>?> generate(Content c,
       {TagPolicy tagPolicy = TagPolicy.saveText}) async {
     final vm = ViewManager.attach(_manager, tagPolicy: tagPolicy);
     vm.produce(c);

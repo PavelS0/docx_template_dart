@@ -51,12 +51,12 @@ part of docx_view;
 
 class _Tree {
   List<_Tree> children = [];
-  _Tree parent;
-  View v;
+  _Tree? parent;
+  View? v;
 }
 
 class XmlCopyVisitor with XmlVisitor {
-  _Tree _current;
+  _Tree? _current;
 
   static final XmlTransformer defaultInstance = XmlTransformer();
 
@@ -82,11 +82,11 @@ class XmlCopyVisitor with XmlVisitor {
       XmlDocumentFragment(node.children.map(visit));
 
   @override
-  XmlElement visitElement(XmlElement node) {
+  XmlElement? visitElement(XmlElement node) {
     if (node is View) {
       final tree = _Tree();
       if (_current != null) {
-        _current.children.add(tree);
+        _current!.children.add(tree);
         tree.parent = _current;
       }
 
@@ -98,13 +98,13 @@ class XmlCopyVisitor with XmlVisitor {
       final childs = node.children.map<XmlNode>(visit).toList(); // copy childs
       final name = visit(node.name);
 
-      final childsViews = tree.children.map((f) => f.v).toList();
+      final childsViews = tree.children.map((f) => f.v!).toList();
       final parentView = tree.parent?.v;
 
       final v = node.createNew(name, attrs, childs, node.isSelfClosing,
           node.tag, node.sdtView, childsViews, parentView);
 
-      _current.v = v;
+      _current!.v = v;
       _current = old;
       return v;
     } else {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:archive/archive.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:xml/xml.dart';
 
 class DocxEntryException implements Exception {
@@ -32,9 +33,9 @@ abstract class DocxEntry {
 class DocxXmlEntry extends DocxEntry {
   DocxXmlEntry();
 
-  XmlDocument _doc;
+  XmlDocument? _doc;
 
-  XmlDocument get doc => _doc;
+  XmlDocument? get doc => _doc;
 
   @override
   void _load(Archive arch, String entryName) {
@@ -51,7 +52,7 @@ class DocxXmlEntry extends DocxEntry {
   @override
   void _updateArchive(Archive arch) {
     if (doc != null) {
-      final data = doc.toXmlString(pretty: false);
+      final data = doc!.toXmlString(pretty: false);
       List<int> out = utf8.encode(data);
       _updateData(arch, out);
     }
@@ -67,7 +68,7 @@ class DocxRel {
 
 class DocxRelsEntry extends DocxXmlEntry {
   DocxRelsEntry();
-  XmlElement _rels;
+  late XmlElement _rels;
   int _id = 1000;
   int _imageId = 1000;
 
@@ -80,18 +81,19 @@ class DocxRelsEntry extends DocxXmlEntry {
     return (_imageId++).toString();
   }
 
-  DocxRel getRel(String id) {
-    final el = _rels.descendants.firstWhere(
-        (e) =>
-            e is XmlElement &&
-            e.name.local == 'Relationship' &&
-            e.getAttribute('Id') == id,
-        orElse: () => null);
+  DocxRel? getRel(String id) {
+    final el = _rels.descendants.firstWhereOrNull((e) =>
+        e is XmlElement &&
+        e.name.local == 'Relationship' &&
+        e.getAttribute('Id') == id);
     if (el != null) {
-      return DocxRel(id, el.getAttribute('Type'), el.getAttribute('Target'));
-    } else {
-      return null;
+      final type = el.getAttribute('Type');
+      final target = el.getAttribute('Target');
+      if (type != null && target != null) {
+        return DocxRel(id, type, target);
+      }
     }
+    return null;
   }
 
   void add(String id, DocxRel rel) {
@@ -113,27 +115,27 @@ class DocxRelsEntry extends DocxXmlEntry {
   @override
   void _load(Archive arch, String entryName) {
     super._load(arch, entryName);
-    _rels = doc.rootElement;
+    _rels = doc!.rootElement;
   }
 }
 
 class DocxBinEntry extends DocxEntry {
   DocxBinEntry([this._data]);
-  List<int> _data;
-  List<int> get data => _data;
+  List<int>? _data;
+  List<int>? get data => _data;
 
   @override
   void _load(Archive arch, String entryName) {
     _index = _getIndex(arch, entryName);
     if (_index > 0) {
       final f = arch.files[_index];
-      _data = f.content as List<int>;
+      _data = f.content as List<int>?;
     }
   }
 
   @override
   void _updateArchive(Archive arch) {
-    _updateData(arch, _data);
+    _updateData(arch, _data!);
   }
 }
 
@@ -143,9 +145,9 @@ class DocxManager {
 
   DocxManager(this.arch);
 
-  T getEntry<T extends DocxEntry>(T Function() creator, String name) {
+  T? getEntry<T extends DocxEntry>(T Function() creator, String name) {
     if (_map.containsKey(name)) {
-      return _map[name] as T;
+      return _map[name] as T?;
     } else {
       final T t = creator();
       t._load(arch, name);
