@@ -4,6 +4,7 @@
 .dart_tool/
 .packages
 .pub/
+.devcontainer/
 .vscode/
 build/
 docx_cache/
