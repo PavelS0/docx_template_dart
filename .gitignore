@@ -5,6 +5,7 @@
 .packages
 .pub/
 .vscode/
+.devcontainer/
 build/
 docx_cache/
 # If you're building an application, you may want to check-in your pubspec.lock
