@@ -41,3 +41,8 @@
 ## 0.2.10
 - Added options in DocxTemplate.generate, allowing save sdt tags
 - XML copy optimizations 
+
+## 0.2.11
+- Attempt to fix concurrent modification
+- Fixed broken TagPolicy export
+- Unrecognized tags are no longer deleted

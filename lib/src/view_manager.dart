@@ -11,6 +11,7 @@ import 'package:path/path.dart' as path;
 part 'view.dart';
 part 'visitor.dart';
 part 'numbering.dart';
+part 'std_view.dart';
 
 class ViewManager {
   final View root;
@@ -37,15 +38,21 @@ class ViewManager {
   }
 
   void _init(XmlElement node, View parent) {
-    View.traverse(node, (n) => n.name.local == "sdt", (e) {
-      var sdtV = SdtView.parse(e);
-      if (sdtV != null) {
-        var v = _initView(sdtV, parent);
-        if (v != null) {
-          _init(v, v);
+    final l = node.children.length;
+    for (var i = 0; i < l; i++) {
+      final c = node.children[i];
+      if (c is XmlElement) {
+        if (c.name.local == "sdt") {
+          var sdtV = SdtView.parse(c);
+          if (sdtV != null) {
+            var v = _initView(sdtV, parent);
+            if (v != null) _init(v, v);
+          }
+        } else {
+          _init(c, parent);
         }
       }
-    });
+    }
   }
 
   void _replaceSdtWithView(SdtView sdtView, View v) {
@@ -57,48 +64,51 @@ class ViewManager {
   }
 
   View _initView(SdtView sdtView, View parent) {
+    const tags = ["table", "plain", "text", "list", "img"];
     View v;
-    final sdtParent = sdtView.sdt.parent;
-    final sdtIndex = sdtParent.children.indexOf(sdtView.sdt);
-    final sdtChilds = sdtView.content.children.toList();
-    sdtParent.children.removeAt(sdtIndex);
-    sdtView.content.children.clear();
+    if (tags.contains(sdtView.tag)) {
+      final sdtParent = sdtView.sdt.parent;
+      final sdtIndex = sdtParent.children.indexOf(sdtView.sdt);
+      final sdtChilds = sdtView.content.children.toList();
+      sdtParent.children.removeAt(sdtIndex);
+      sdtView.content.children.clear();
 
-    switch (sdtView.tag) {
-      case "table":
-        v = RowView(XmlName("table"), [], sdtChilds, false, sdtView.name,
-            sdtView, [], parent);
-        break;
-      case "plain":
-        v = PlainView(XmlName("plain"), [], sdtChilds, false, sdtView.name,
-            sdtView, [], parent);
-        break;
-      case "text":
-        v = TextView(XmlName("text"), [], sdtChilds, false, sdtView.name,
-            sdtView, [], parent);
-        break;
-      case "list":
-        v = ListView(XmlName("list"), [], sdtChilds, false, sdtView.name,
-            sdtView, [], parent);
-        break;
-      case "img":
-        v = ImgView(XmlName("img"), [], sdtChilds, false, sdtView.name, sdtView,
-            [], parent);
-        break;
-    }
-    if (v != null) {
-      parent.childrensView.add(v);
-      sdtParent.children.insert(sdtIndex, v);
-
-      if (parent.sub == null) {
-        parent.sub = {};
+      switch (sdtView.tag) {
+        case "table":
+          v = RowView(XmlName("table"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "plain":
+          v = PlainView(XmlName("plain"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "text":
+          v = TextView(XmlName("text"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "list":
+          v = ListView(XmlName("list"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "img":
+          v = ImgView(XmlName("img"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
       }
-      final sub = parent.sub;
+      if (v != null) {
+        parent.childrensView.add(v);
+        sdtParent.children.insert(sdtIndex, v);
 
-      if (sub.containsKey(sdtView.name)) {
-        sub[sdtView.name].add(v);
-      } else {
-        sub[sdtView.name] = [v];
+        if (parent.sub == null) {
+          parent.sub = {};
+        }
+        final sub = parent.sub;
+
+        if (sub.containsKey(sdtView.name)) {
+          sub[sdtView.name].add(v);
+        } else {
+          sub[sdtView.name] = [v];
+        }
       }
     }
     return v;
@@ -134,9 +144,12 @@ class ViewManager {
   }
 
   produce(Content c) {
-    for (var key in root.sub.keys) {
-      for (var v in root.sub[key]) {
-        _produceInner(c, v);
+    var sub = root.sub;
+    if (sub != null) {
+      for (var key in sub.keys) {
+        for (var v in sub[key]) {
+          _produceInner(c, v);
+        }
       }
     }
   }

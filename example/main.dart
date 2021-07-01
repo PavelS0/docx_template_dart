@@ -22,6 +22,21 @@ void main() async {
   // Load test image for inserting in docx
   final testFileContent = await File('test.jpg').readAsBytes();
 
+  final listNormal = ['Foo', 'Bar', 'Baz'];
+  final listBold = ['ooF', 'raB', 'zaB'];
+
+  final contentList = <Content>[];
+
+  final b = listBold.iterator;
+  for (var n in listNormal) {
+    b.moveNext();
+
+    final c = PlainContent("value")
+      ..add(TextContent("normal", n))
+      ..add(TextContent("bold", b.current));
+    contentList.add(c);
+  }
+
   Content c = Content();
   c
     ..add(TextContent("docname", "Simple docname"))
@@ -30,7 +45,8 @@ void main() async {
       RowContent()
         ..add(TextContent("key1", "Paul"))
         ..add(TextContent("key2", "Viberg"))
-        ..add(TextContent("key3", "Engineer")),
+        ..add(TextContent("key3", "Engineer"))
+        ..add(ImageContent('img', testFileContent)),
       RowContent()
         ..add(TextContent("key1", "Alex"))
         ..add(TextContent("key2", "Houser"))
@@ -39,17 +55,11 @@ void main() async {
           TextContent("value", "Mercedes-Benz C-Class S205"),
           TextContent("value", "Lexus LX 570")
         ]))
+        ..add(ImageContent('img', testFileContent))
     ]))
     ..add(ListContent("list", [
       TextContent("value", "Engine")
-        ..add(ListContent("listnested", [
-          PlainContent("value")
-            ..add(TextContent("normal", "BMW MTech"))
-            ..add(TextContent("bold", "S55")),
-          PlainContent("value")
-            ..add(TextContent("normal", "BMW"))
-            ..add(TextContent("bold", "N55")),
-        ])),
+        ..add(ListContent("listnested", contentList)),
       TextContent("value", "Gearbox"),
       TextContent("value", "Chassis")
     ]))
@@ -59,8 +69,7 @@ void main() async {
           RowContent()
             ..add(TextContent("key1", "Paul"))
             ..add(TextContent("key2", "Viberg"))
-            ..add(TextContent("key3", "Engineer"))
-            ..add(ImageContent('img', testFileContent)),
+            ..add(TextContent("key3", "Engineer")),
           RowContent()
             ..add(TextContent("key1", "Alex"))
             ..add(TextContent("key2", "Houser"))
@@ -69,7 +78,6 @@ void main() async {
               TextContent("value", "Mercedes-Benz C-Class S205"),
               TextContent("value", "Lexus LX 570")
             ]))
-            ..add(ImageContent('img', testFileContent))
         ])),
       PlainContent("plainview")
         ..add(TableContent("table", [
@@ -99,9 +107,8 @@ void main() async {
     ]))
     ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
     ..add(ImageContent('img', testFileContent));
-  ;
 
   final d = await docx.generate(c);
   final of = File('generated.docx');
-  await of.writeAsBytes(d);
+  if (d != null) await of.writeAsBytes(d);
 }
