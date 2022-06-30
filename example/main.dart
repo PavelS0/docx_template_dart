@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:docx_template/src/template.dart';
-import 'package:docx_template/src/model.dart';
+import 'package:docx_template/docx_template.dart';
 
 ///
 /// Read file template.docx, produce it and save
@@ -23,7 +22,7 @@ void main() async {
   final testFileContent = await File('test.jpg').readAsBytes();
 
   final listNormal = ['Foo', 'Bar', 'Baz'];
-  final listBold = ['ooF', 'raB', 'zaB'];
+  final listBold = ['ooFPlop', 'raB', 'zaB'];
 
   final contentList = <Content>[];
 
@@ -37,8 +36,8 @@ void main() async {
     contentList.add(c);
   }
 
-  Content c = Content();
-  c
+  Content content = Content();
+  content
     ..add(TextContent("docname", "Simple docname"))
     ..add(TextContent("passport", "Passport NE0323 4456673"))
     ..add(TableContent("table", [
@@ -108,7 +107,7 @@ void main() async {
     ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
     ..add(ImageContent('img', testFileContent));
 
-  final d = await docx.generate(c);
-  final of = File('generated.docx');
-  if (d != null) await of.writeAsBytes(d);
+  final docGenerated = await docx.generate(content);
+  final fileGenerated = File('generated.docx');
+  if (docGenerated != null) await fileGenerated.writeAsBytes(docGenerated);
 }

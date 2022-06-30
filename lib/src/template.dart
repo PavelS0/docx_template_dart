@@ -1,6 +1,7 @@
 import 'package:archive/archive.dart';
-import 'package:docx_template/src/model.dart';
+import 'package:docx_template/docx_template.dart';
 import 'package:docx_template/src/view_manager.dart';
+
 import 'docx_entry.dart';
 
 class DocxTemplateException implements Exception {
@@ -9,7 +10,7 @@ class DocxTemplateException implements Exception {
   DocxTemplateException(this.message);
 
   @override
-  String toString() => this.message;
+  String toString() => message;
 }
 
 ///
@@ -39,6 +40,41 @@ class DocxTemplate {
     return component;
   }
 
+//   exportPdf() async {
+//     var configuration = Configuration('9849d3fc-3eb2-442a-a085-8d21d92c3ad3',
+//         '798d958e76c462d62b41be3d754a9d25');
+//     var wordsApi = WordsApi(configuration);
+// // Upload file to cloud
+//     var localFileContent = await (File('generated.docx').readAsBytes());
+//     var uploadRequest = UploadFileRequest(
+//         ByteData.view(localFileContent.buffer), 'fileStoredInCloud.docx');
+//     await wordsApi.uploadFile(uploadRequest);
+//
+// // Save file as pdf in cloud
+//     var saveOptionsData = PdfSaveOptionsData()
+//       ..fileName = 'destStoredInCloud.pdf';
+//     var saveAsRequest =
+//         SaveAsRequest('fileStoredInCloud.docx', saveOptionsData);
+//     await wordsApi.saveAs(saveAsRequest);
+//   }
+
+  ///
+  ///Get all tags from template
+  ///
+  List<String> getTags() {
+    final viewManager = ViewManager.attach(
+      _manager,
+    );
+    List<String> listTags = [];
+    var sub = viewManager.root.sub;
+    if (sub != null) {
+      for (var key in sub.keys) {
+        listTags.add(key);
+      }
+    }
+    return listTags;
+  }
+
   ///
   /// Generates byte buffer with docx file content by given [c]
   ///
@@ -48,6 +84,7 @@ class DocxTemplate {
     vm.produce(c);
     _manager.updateArch();
     final enc = ZipEncoder();
+
     return enc.encode(_manager.arch);
   }
 }

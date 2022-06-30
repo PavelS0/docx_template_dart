@@ -52,6 +52,7 @@
 - Fixed broken TagPolicy export
 - Unrecognized tags are no longer deleted
 
-## 0.3.2
-- Fixed example
-- updated readme
+## 0.3.3
+- Add test
+- Fixed null safety for xml package
+- Added function dor get all tags

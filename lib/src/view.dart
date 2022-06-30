@@ -1,7 +1,7 @@
 part of docx_view;
 
-typedef bool Check(XmlElement n);
-typedef void OnFound(XmlElement e);
+typedef Check = bool Function(XmlElement n);
+typedef OnFound = void Function(XmlElement e);
 
 class View<T extends Content?> extends XmlElement {
   Map<String, List<View>>? sub;
@@ -37,11 +37,6 @@ class View<T extends Content?> extends XmlElement {
     return [];
   }
 
-  static XmlElement? _findChild(XmlElement e, String tag) {
-    return e.descendants.firstWhereOrNull(
-        (test) => test is XmlElement && test.name.local == tag) as XmlElement?;
-  }
-
   static XmlAttribute? _findAttr(XmlElement e, String attr) {
     return e.attributes.firstWhereOrNull((test) => test.name.local == attr);
   }
@@ -62,9 +57,9 @@ class TextView extends View<TextContent?> {
 
   @override
   List<XmlElement> produce(ViewManager vm, TextContent? c) {
-    XmlElement copy = this.accept(XmlCopyVisitor());
+    XmlElement copy = XmlCopyVisitor().visitElement(this)!;
     final r = findR(copy);
-    if (r != null && c != null && c.text != null) {
+    if (r != null && c != null) {
       _removeRSiblings(r);
       _updateRText(vm, r, c.text);
     }
@@ -111,14 +106,6 @@ class TextView extends View<TextContent?> {
     }
   }
 
-  List<XmlElement?> _makeTCopies(ViewManager vm, XmlElement t, int totalCount) {
-    final tCopies = <XmlElement?>[];
-    for (var i = 0; i < totalCount; i++) {
-      tCopies.add(t.accept(XmlCopyVisitor()));
-    }
-    return tCopies;
-  }
-
   XmlElement _brElement() => XmlElement(XmlName('br', 'w'));
 
   void _updateRText(ViewManager vm, XmlElement r, String? text) {
@@ -129,14 +116,15 @@ class TextView extends View<TextContent?> {
       var multiline = text != null && text.contains('\n');
       if (multiline) {
         var pasteIndex = tIndex + 1;
-        final lines = text!.split('\n');
+        final lines = text.split('\n');
         for (var l in lines) {
           if (l == lines.first) {
             // Update exists T tag
             t.children[0] = XmlText(l);
           } else {
             // Make T tag copy and add to R
-            final XmlElement tCp = t.accept(XmlCopyVisitor());
+            final XmlElement tCp =
+                XmlCopyVisitor().visitElement(t as XmlElement)!;
             tCp.children[0] = XmlText(l);
             r.children.insert(pasteIndex++, tCp);
           }
@@ -163,7 +151,7 @@ class PlainView extends View<PlainContent?> {
             childrensView, parentView);
   @override
   List<XmlElement> produce(ViewManager vm, PlainContent? c) {
-    View copy = this.accept(XmlCopyVisitor());
+    View copy = XmlCopyVisitor().visitElement(this) as View;
     for (var v in copy.childrensView) {
       vm._produceInner(c, v);
     }
@@ -286,7 +274,7 @@ class ListView extends View<ListContent?> {
         newNumId = _getNewNumId(vm, this);
       }
       for (var cont in c.list) {
-        View copy = this.accept(XmlCopyVisitor());
+        View copy = XmlCopyVisitor().visitElement(this) as View;
 
         if (newNumId.isNotEmpty &&
             vs.any((element) => element is PlainView || element is RowView)) {
@@ -336,11 +324,11 @@ class RowView extends View<TableContent?> {
     List<XmlElement> l = [];
 
     if (c == null) {
-      XmlElement copy = this.accept(XmlCopyVisitor());
+      XmlElement copy = XmlCopyVisitor().visitElement(this)!;
       l = List.from(copy.children);
     } else {
       for (var cont in c.rows) {
-        View copy = this.accept(XmlCopyVisitor());
+        View copy = XmlCopyVisitor().visitElement(this) as View;
         for (var v in copy.childrensView) {
           vm._produceInner(cont, v);
         }
@@ -381,7 +369,7 @@ class ImgView extends View<ImageContent?> {
   @override
   List<XmlElement> produce(ViewManager vm, ImageContent? c) {
     List<XmlElement> l = [];
-    XmlElement copy = this.accept(XmlCopyVisitor());
+    XmlElement copy = XmlCopyVisitor().visitElement(this) as View;
     l = List.from(copy.children);
     if (c != null) {
       final pr = copy.descendants

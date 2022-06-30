@@ -1,14 +1,12 @@
 import 'dart:collection';
 
-import 'dart:typed_data';
-
 ///
 /// Root content element, use method add() to add inner contents
 ///
 class Content extends MapBase<String, Content> {
   String key;
   Map<String, Content> sub = {};
-  Content([this.key = '', Map<String, Content>? sub]) : this.sub = sub ?? {};
+  Content([this.key = '', Map<String, Content>? sub]) : sub = sub ?? {};
 
   @override
   Content? operator [](Object? key) {
