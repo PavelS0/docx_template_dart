@@ -16,7 +16,7 @@ class SdtView {
   }
 
   SdtView(this.tag, this.name, this.content, this.sdt, this._idVal,
-      [this.parent = null, this.childs = const []]);
+      [this.parent, this.childs = const []]);
 
   static XmlElement? firstChild(XmlElement e, String name) {
     return e.children.firstWhereOrNull(
@@ -40,7 +40,7 @@ class SdtView {
   }
 
   static void traverseTree(
-      SdtView tree, void visit(SdtView v, SdtView? parent)) {
+      SdtView tree, void Function(SdtView v, SdtView? parent) visit) {
     for (var e in tree.childs) {
       visit(e, e.parent);
       traverseTree(e, visit);
@@ -60,7 +60,7 @@ class SdtView {
     return rootSdt;
   }
 
-  static SdtView? parse(XmlElement e, [SdtView? parent = null]) {
+  static SdtView? parse(XmlElement e, [SdtView? parent]) {
     if (e.name.local == "sdt") {
       final sdt = e;
       final sdtPr = firstChild(sdt, "sdtPr");

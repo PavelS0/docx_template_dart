@@ -91,9 +91,7 @@ class Numbering {
   void _findAndRemoveNsid(XmlElement abstractNode) {
     final nsid = abstractNode.children
         .firstWhere((n) => n is XmlElement && n.name.local == 'nsid');
-    if (nsid != null) {
-      abstractNode.children.remove(nsid);
-    }
+    abstractNode.children.remove(nsid);
   }
 
   XmlElement createNumNode(_Num n) {
@@ -119,8 +117,10 @@ class Numbering {
 
       final abstractNumNode =
           _findAbstractNumNode(_doc.rootElement, oldNum.abstractId)!;
-      final abstractNumNodeCopy = abstractNumNode.accept(XmlCopyVisitor());
-      _changeAbstractNumNodeId(abstractNumNodeCopy, newNum.abstractId);
+
+      final abstractNumNodeCopy =
+          XmlCopyVisitor().visitElement(abstractNumNode);
+      _changeAbstractNumNodeId(abstractNumNodeCopy!, newNum.abstractId);
       _findAndRemoveNsid(abstractNumNodeCopy);
       _doc.rootElement.children.insert(0, abstractNumNodeCopy);
 

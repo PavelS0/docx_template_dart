@@ -2,17 +2,16 @@ library docx_view;
 
 import 'dart:collection';
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:docx_template/docx_template.dart';
 import 'package:docx_template/src/docx_entry.dart';
-import 'package:docx_template/src/template.dart';
-import 'package:xml/xml.dart';
 import 'package:path/path.dart' as path;
-import 'package:collection/collection.dart' show IterableExtension;
+import 'package:xml/xml.dart';
 
-part 'view.dart';
-part 'visitor.dart';
 part 'numbering.dart';
 part 'std_view.dart';
+part 'view.dart';
+part 'visitor.dart';
 
 class ViewManager {
   final View root;
@@ -23,7 +22,7 @@ class ViewManager {
 
   int get sdtId => _sdtId++;
 
-  Queue<View> _viewStack = Queue();
+  final Queue<View> _viewStack = Queue();
   ViewManager._(this.root, this.numbering, this.docxManager, this.tagPolicy);
 
   factory ViewManager.attach(DocxManager docxMan,
@@ -103,9 +102,7 @@ class ViewManager {
         parent.childrensView.add(v);
         sdtParent.children.insert(sdtIndex, v);
 
-        if (parent.sub == null) {
-          parent.sub = {};
-        }
+        parent.sub ??= {};
         final sub = parent.sub!;
 
         if (sub.containsKey(sdtView.name)) {
@@ -130,8 +127,8 @@ class ViewManager {
     }
     SdtView? sdtViewCp;
     if (insertBetween != null) {
-      final copy = insertBetween.sdt.accept(XmlCopyVisitor());
-      sdtViewCp = SdtView.parse(copy);
+      final copy = XmlCopyVisitor().visitElement(insertBetween.sdt);
+      sdtViewCp = SdtView.parse(copy!);
       if (sdtViewCp != null) {
         sdtViewCp.id = sdtId;
         sdtViewCp.content.children.addAll(to);
@@ -150,12 +147,12 @@ class ViewManager {
     }
   }
 
-  produce(Content c) {
+  produce(Content content) {
     var sub = root.sub;
     if (sub != null) {
       for (var key in sub.keys) {
         for (var v in sub[key]!) {
-          _produceInner(c, v);
+          _produceInner(content, v);
         }
       }
     }

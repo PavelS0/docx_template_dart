@@ -1,10 +1,14 @@
 import 'dart:io';
+
 import 'package:docx_template/docx_template.dart';
-import 'package:docx_template/src/template.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('generate', () async {
+  test('generate word', () async {
+    final fileGenerated = File('generated.docx');
+    if (fileGenerated.existsSync()) {
+      await fileGenerated.delete();
+    }
     final f = File("template.docx");
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
 
@@ -95,9 +99,8 @@ void main() {
       ]))
       ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
       ..add(ImageContent('img', testFileContent));
-
     final d = await docx.generate(c);
-    final of = File('generated.docx');
-    if (d != null) await of.writeAsBytes(d);
+    if (d != null) await fileGenerated.writeAsBytes(d);
+    expect(await fileGenerated.exists(), true);
   });
 }

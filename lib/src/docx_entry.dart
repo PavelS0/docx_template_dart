@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:archive/archive.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:xml/xml.dart';
@@ -157,9 +158,9 @@ class DocxManager {
   }
 
   void add(String name, DocxEntry e) {
-    if (_map.containsKey(name))
+    if (_map.containsKey(name)) {
       throw DocxEntryException('Entry already exists');
-    else {
+    } else {
       e._name = name;
       _map[name] = e;
     }
