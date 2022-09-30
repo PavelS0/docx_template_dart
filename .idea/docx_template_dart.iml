@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="android" name="Android">
+      <configuration />
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/package/syncfusion_flutter_pdf/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/package/syncfusion_flutter_pdf/build" />
+      <excludeFolder url="file://$MODULE_DIR$/package/syncfusion_flutter_pdf/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/package/syncfusion_flutter_pdf/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/package/syncfusion_flutter_pdf/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/package/syncfusion_flutter_pdf/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/example/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_pdf/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_core/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_core/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_core/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_core/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_core/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/syncfusion_flutter_core/example/.dart_tool" />
+    </content>
+    <orderEntry type="jdk" jdkName="Android API 32 Platform" jdkType="Android SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Dart SDK" level="project" />
+    <orderEntry type="library" name="Dart Packages" level="project" />
+    <orderEntry type="library" name="Flutter Plugins" level="project" />
+  </component>
+</module>

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:docx_template/docx_template.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('generate word', () async {

@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:docx_template/docx_template.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:pdf/pdf.dart';
 
 void main() {
   test('getTags', () async {
@@ -19,9 +20,32 @@ void main() {
     expect(list[7], 'img');
   });
 
-  // test('generate pdf', () async {
-  //   final f = File("template.docx");
-  //   final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
-  //   final list = docx.exportPdf();
-  // });
+  test('getPageFormat', () async {
+    final f = File("doc_test.docx");
+    final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
+    final pdfFormatPage = await docx.getPageFormat();
+    expect(
+      pdfFormatPage,
+      PdfPageFormat(
+        420,
+        594,
+        marginTop: 30,
+        marginRight: 30,
+        marginLeft: 40,
+        marginBottom: 25,
+      ),
+    );
+  });
+  test('generate body', () async {
+    final f = File("doc_test.docx");
+    final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
+    final body = docx.generateBody();
+  });
+  test('export pdf', () async {
+    final f = File("doc_test.docx");
+    final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
+    final pdf = await docx.exportPdf();
+    final file = File("example.pdf");
+    await file.writeAsBytes(await pdf.save());
+  });
 }
