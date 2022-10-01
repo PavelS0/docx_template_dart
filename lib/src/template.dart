@@ -1,8 +1,6 @@
 import 'package:archive/archive.dart';
 import 'package:docx_template/docx_template.dart';
 import 'package:docx_template/src/view_manager.dart';
-import 'package:flutter/src/painting/text_style.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:xml/xml.dart';
@@ -34,7 +32,7 @@ class DocxTemplate {
   late DocxManager _manager;
   late double linePitch = 1;
   double ratio = 28.35;
-  double ratioText = 2.3;
+  double ratioText = 2.5;
 
   ///
   /// Load Template from byte buffer of docx file
@@ -70,12 +68,17 @@ class DocxTemplate {
       if (element.name.local == 'p') {
         pw.TextAlign textAlign = pw.TextAlign.left;
         pw.FontWeight fontWeight = pw.FontWeight.normal;
-        TextStyle font = GoogleFonts.inter();
-        print(font.fontFamily);
+        pw.FontStyle fontStyle = pw.FontStyle.normal;
+        pw.Font font = pw.Font.helvetica();
+        pw.TextDecoration textDecoration = pw.TextDecoration.none;
+        PdfColor color = PdfColor.fromHex('#00000000');
+        pw.TextDecorationStyle textDecorationStyle =
+            pw.TextDecorationStyle.solid;
 
         double fontSize = 11;
         pw.MainAxisAlignment mainAxisAlignement = pw.MainAxisAlignment.start;
         List<pw.Widget> listWidgetRow = [];
+
         element.childElements.forEach((elementParagraphe) {
           switch (elementParagraphe.name.local) {
             case 'pPr':
@@ -83,9 +86,19 @@ class DocxTemplate {
                 switch (elementpPr.name.local) {
                   case 'jc':
                     if (elementpPr.attributes.first.name.local == 'val') {
-                      if (elementpPr.attributes.first.value == 'center') {
-                        textAlign = pw.TextAlign.center;
-                        mainAxisAlignement = pw.MainAxisAlignment.center;
+                      switch (elementpPr.attributes.first.value) {
+                        case 'center':
+                          textAlign = pw.TextAlign.center;
+                          mainAxisAlignement = pw.MainAxisAlignment.center;
+                          break;
+                        case 'left':
+                          textAlign = pw.TextAlign.left;
+                          mainAxisAlignement = pw.MainAxisAlignment.start;
+                          break;
+                        case 'right':
+                          textAlign = pw.TextAlign.right;
+                          mainAxisAlignement = pw.MainAxisAlignment.end;
+                          break;
                       }
                     }
                     break;
@@ -94,6 +107,37 @@ class DocxTemplate {
                       switch (elementrPr.name.local) {
                         case 'b':
                           fontWeight = pw.FontWeight.bold;
+                          break;
+                        case 'i':
+                          fontStyle = pw.FontStyle.italic;
+                          break;
+                        case 'color':
+                          if (elementrPr.attributes.first.name.local == 'val') {
+                            color = PdfColor.fromHex(
+                                '#${elementrPr.attributes.first.value}');
+                          }
+
+                          break;
+                        case 'u':
+                          if (elementrPr.attributes.first.name.local == 'val') {
+                            switch (elementrPr.attributes.first.value) {
+                              case 'single':
+                                textDecoration = pw.TextDecoration.underline;
+                                textDecorationStyle =
+                                    pw.TextDecorationStyle.solid;
+                                break;
+                              case 'double':
+                                textDecoration = pw.TextDecoration.underline;
+                                textDecorationStyle =
+                                    pw.TextDecorationStyle.double;
+                                break;
+                            }
+                          }
+                          break;
+                        case 'rFonts':
+                          font = matchFont(
+                            fontText: elementrPr.attributes.first.value,
+                          );
                           break;
                         case 'sz':
                           if (elementrPr.attributes.first.name.local == 'val') {
@@ -110,42 +154,44 @@ class DocxTemplate {
               break;
             case 'r':
               elementParagraphe.childElements.forEach((elementR) {
-                switch (elementR.name.local) {
-                  case 't':
-                    if (listWidgetRow.length > 0) {
-                      if (listWidgetRow.last.runtimeType == pw.Text) {
-                        listWidgetRow.last = pw.Text(
-                          (listWidgetRow.last as pw.Text).text.toPlainText() +
-                              elementR.children.first.text,
-                          style: pw.TextStyle(
-                            fontWeight: fontWeight,
-                            fontSize: fontSize,
-                            font: pw.Font.times(),
-                          ),
-                        );
-                        break;
-                      }
-                    }
-                    print(fontSize);
-                    listWidgetRow.add(
-                      pw.Text(
-                        elementR.children.first.text,
+                createRow(
+                  elementR: elementR,
+                  listWidgetRow: listWidgetRow,
+                  color: color,
+                  fontSize: fontSize,
+                  font: font,
+                  textDecoration: textDecoration,
+                  textDecorationStyle: textDecorationStyle,
+                  textAlign: textAlign,
+                  fontWeight: fontWeight,
+                  fontStyle: fontStyle,
+                );
+              });
+              break;
+            case 'text':
+              elementParagraphe.childElements.forEach((elementSdt) {
+                switch (elementSdt.name.local) {
+                  case 'r':
+                    elementSdt.childElements.forEach((elementRSdt) {
+                      createRow(
+                        elementR: elementRSdt,
+                        listWidgetRow: listWidgetRow,
+                        color: color,
+                        fontSize: fontSize,
+                        font: font,
+                        textDecoration: textDecoration,
+                        textDecorationStyle: textDecorationStyle,
                         textAlign: textAlign,
-                        style: pw.TextStyle(
-                          fontWeight: fontWeight,
-                          fontSize: fontSize,
-                          font: pw.Font.times(),
-                        ),
-                      ),
-                    );
-
-                    break;
+                        fontWeight: fontWeight,
+                        fontStyle: fontStyle,
+                      );
+                    });
                 }
               });
-
               break;
           }
         });
+
         listeWidget.add(
           pw.Row(
             mainAxisAlignment: mainAxisAlignement,
@@ -257,5 +303,162 @@ class DocxTemplate {
     final enc = ZipEncoder();
 
     return enc.encode(_manager.arch);
+  }
+
+  pw.Font matchFontStyle({
+    required pw.Font font,
+    required pw.FontWeight fontWeight,
+    required pw.FontStyle fontStyle,
+  }) {
+    switch (font.fontName) {
+      case 'Times-Roman':
+        if (fontWeight == pw.FontWeight.bold &&
+            fontStyle == pw.FontStyle.italic) {
+          return pw.Font.timesBoldItalic();
+        }
+        if (fontWeight == pw.FontWeight.bold) {
+          return pw.Font.timesBold();
+        }
+        if (fontStyle == pw.FontStyle.italic) {
+          return pw.Font.timesItalic();
+        }
+        return pw.Font.times();
+      case 'Courier':
+        if (fontWeight == pw.FontWeight.bold &&
+            fontStyle == pw.FontStyle.italic) {
+          return pw.Font.courierBoldOblique();
+        }
+        if (fontWeight == pw.FontWeight.bold) {
+          return pw.Font.courierBold();
+        }
+        if (fontStyle == pw.FontStyle.italic) {
+          return pw.Font.courierOblique();
+        }
+        return pw.Font.courier();
+    }
+    if (fontWeight == pw.FontWeight.bold && fontStyle == pw.FontStyle.italic) {
+      return pw.Font.helveticaBoldOblique();
+    }
+    if (fontWeight == pw.FontWeight.bold) {
+      return pw.Font.helveticaBold();
+    }
+    if (fontStyle == pw.FontStyle.italic) {
+      return pw.Font.helveticaOblique();
+    }
+    return pw.Font.helvetica();
+  }
+
+  pw.Font matchFont({
+    required String fontText,
+  }) {
+    switch (fontText) {
+      case 'Times New Roman':
+        return pw.Font.times();
+      case 'Courier New':
+        return pw.Font.courier();
+    }
+    return pw.Font.helvetica();
+  }
+
+  void createRow({
+    required XmlElement elementR,
+    required List<pw.Widget> listWidgetRow,
+    required PdfColor color,
+    required double fontSize,
+    required pw.Font font,
+    required pw.TextDecoration textDecoration,
+    required pw.TextDecorationStyle textDecorationStyle,
+    required pw.TextAlign textAlign,
+    required pw.FontWeight fontWeight,
+    required pw.FontStyle fontStyle,
+  }) {
+    switch (elementR.name.local) {
+      case 't':
+        if (listWidgetRow.length > 0) {
+          if (listWidgetRow.last.runtimeType == pw.Text) {
+            listWidgetRow.last = pw.Text(
+              (listWidgetRow.last as pw.Text).text.toPlainText() +
+                  elementR.text,
+              style: pw.TextStyle(
+                color: color,
+                fontSize: fontSize,
+                font: matchFontStyle(
+                  font: font,
+                  fontWeight: fontWeight,
+                  fontStyle: fontStyle,
+                ),
+                decoration: textDecoration,
+                decorationStyle: textDecorationStyle,
+              ),
+            );
+            break;
+          }
+        }
+        listWidgetRow.add(
+          pw.Expanded(
+            child: pw.Text(
+              elementR.children.first.text,
+              textAlign: textAlign,
+              style: pw.TextStyle(
+                color: color,
+                fontSize: fontSize,
+                font: matchFontStyle(
+                  font: font,
+                  fontWeight: fontWeight,
+                  fontStyle: fontStyle,
+                ),
+                decoration: textDecoration,
+                decorationStyle: textDecorationStyle,
+              ),
+            ),
+          ),
+        );
+
+        break;
+      case 'rPr':
+        elementR.childElements.forEach((elementSdtPr) {
+          switch (elementSdtPr.name.local) {
+            case 'b':
+              fontWeight = pw.FontWeight.bold;
+              break;
+            case 'i':
+              fontStyle = pw.FontStyle.italic;
+              break;
+            case 'color':
+              if (elementSdtPr.attributes.first.name.local == 'val') {
+                color =
+                    PdfColor.fromHex('#${elementSdtPr.attributes.first.value}');
+              }
+
+              break;
+            case 'u':
+              if (elementSdtPr.attributes.first.name.local == 'val') {
+                switch (elementSdtPr.attributes.first.value) {
+                  case 'single':
+                    textDecoration = pw.TextDecoration.underline;
+                    textDecorationStyle = pw.TextDecorationStyle.solid;
+                    break;
+                  case 'double':
+                    textDecoration = pw.TextDecoration.underline;
+                    textDecorationStyle = pw.TextDecorationStyle.double;
+                    break;
+                }
+              }
+              break;
+            case 'rFonts':
+              font = matchFont(
+                fontText: elementSdtPr.attributes.first.value,
+              );
+              break;
+            case 'sz':
+              if (elementSdtPr.attributes.first.name.local == 'val') {
+                fontSize = double.parse(elementSdtPr.attributes.first.value) /
+                    ratioText;
+              }
+              break;
+          }
+        });
+        break;
+    }
   }
 }

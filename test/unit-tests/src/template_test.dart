@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:docx_template/docx_template.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart';
 
 void main() {
   test('getTags', () async {
@@ -41,11 +42,41 @@ void main() {
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
     final body = docx.generateBody();
   });
+
   test('export pdf', () async {
     final f = File("doc_test.docx");
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
     final pdf = await docx.exportPdf();
     final file = File("example.pdf");
     await file.writeAsBytes(await pdf.save());
+  });
+
+  test('match font', () async {
+    final f = File("doc_test.docx");
+    final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
+    expect(
+      docx
+          .matchFont(
+            fontText: 'Times New Roman',
+          )
+          .fontName,
+      Font.times().fontName,
+    );
+    expect(
+      docx
+          .matchFont(
+            fontText: 'Courier New',
+          )
+          .fontName,
+      Font.courier().fontName,
+    );
+    expect(
+      docx
+          .matchFont(
+            fontText: 'C',
+          )
+          .fontName,
+      Font.helvetica().fontName,
+    );
   });
 }
