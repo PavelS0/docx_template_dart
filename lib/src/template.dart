@@ -78,6 +78,7 @@ class DocxTemplate {
         double fontSize = 11;
         bool option = false;
         pw.MainAxisAlignment mainAxisAlignement = pw.MainAxisAlignment.start;
+        pw.CrossAxisAlignment crossAxisAlignment = pw.CrossAxisAlignment.start;
         List<pw.Widget> listWidgetRow = [];
 
         element.childElements.forEach((elementParagraphe) {
@@ -91,14 +92,17 @@ class DocxTemplate {
                         case 'center':
                           textAlign = pw.TextAlign.center;
                           mainAxisAlignement = pw.MainAxisAlignment.center;
+                          crossAxisAlignment = pw.CrossAxisAlignment.center;
                           break;
                         case 'left':
                           textAlign = pw.TextAlign.left;
                           mainAxisAlignement = pw.MainAxisAlignment.start;
+                          crossAxisAlignment = pw.CrossAxisAlignment.start;
                           break;
                         case 'right':
                           textAlign = pw.TextAlign.right;
                           mainAxisAlignement = pw.MainAxisAlignment.end;
+                          crossAxisAlignment = pw.CrossAxisAlignment.end;
                           break;
                       }
                     }
@@ -159,6 +163,8 @@ class DocxTemplate {
             case 'r':
               elementParagraphe.childElements.forEach((elementR) {
                 createRow(
+                  mainAxisAlignement: mainAxisAlignement,
+                  crossAxisAlignment: crossAxisAlignment,
                   option: option,
                   elementR: elementR,
                   listWidgetRow: listWidgetRow,
@@ -179,6 +185,8 @@ class DocxTemplate {
                   case 'r':
                     elementSdt.childElements.forEach((elementRSdt) {
                       createRow(
+                        mainAxisAlignement: mainAxisAlignement,
+                        crossAxisAlignment: crossAxisAlignment,
                         option: option,
                         elementR: elementRSdt,
                         listWidgetRow: listWidgetRow,
@@ -203,9 +211,6 @@ class DocxTemplate {
             mainAxisAlignment: mainAxisAlignement,
             children: listWidgetRow,
           ),
-        );
-        listeWidget.add(
-          pw.SizedBox(height: linePitch),
         );
       }
     });
@@ -378,53 +383,64 @@ class DocxTemplate {
     required pw.FontWeight fontWeight,
     required pw.FontStyle fontStyle,
     required bool option,
+    required pw.MainAxisAlignment mainAxisAlignement,
+    required pw.CrossAxisAlignment crossAxisAlignment,
   }) {
     switch (elementR.name.local) {
       case 't':
         if (listWidgetRow.length > 0) {
           if (listWidgetRow.last.runtimeType == pw.Expanded) {
-            listWidgetRow.last = pw.Expanded(
-              child: pw.Text(
-                ((listWidgetRow.last as pw.Expanded).child as pw.Text)
-                        .text
-                        .toPlainText() +
-                    elementR.text,
-                textAlign: textAlign,
-                style: pw.TextStyle(
-                  color: color,
-                  fontSize: fontSize,
-                  font: matchFontStyle(
-                    font: font,
-                    fontWeight: fontWeight,
-                    fontStyle: fontStyle,
-                  ),
-                  decoration: textDecoration,
-                  decorationStyle: textDecorationStyle,
-                ),
-              ),
-            );
-            break;
-          }
-        }
-        listWidgetRow.add(
-          option == true
-              ? pw.Expanded(
-                  child: pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.start,
-                      children: [
-                        pw.Container(
-                          width: fontSize / 3,
-                          height: fontSize / 3,
-                          decoration: pw.BoxDecoration(
-                            color: color,
-                            borderRadius: pw.BorderRadius.all(
-                              pw.Radius.circular(fontSize / 6),
+            listWidgetRow.last = option == true
+                ? pw.Expanded(
+                    child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        children: [
+                          pw.SizedBox(width: 20),
+                          pw.Container(
+                            width: fontSize / 3,
+                            height: fontSize / 3,
+                            decoration: pw.BoxDecoration(
+                              color: color,
+                              borderRadius: pw.BorderRadius.all(
+                                pw.Radius.circular(fontSize / 6),
+                              ),
                             ),
                           ),
-                        ),
-                        pw.SizedBox(width: 5),
+                          pw.SizedBox(width: 10),
+                          pw.Text(
+                            (((listWidgetRow.last as pw.Expanded).child
+                                            as pw.Row)
+                                        .children[3] as pw.Text)
+                                    .text
+                                    .toPlainText() +
+                                elementR.text,
+                            textAlign: textAlign,
+                            style: pw.TextStyle(
+                              color: color,
+                              fontSize: fontSize,
+                              font: matchFontStyle(
+                                font: font,
+                                fontWeight: fontWeight,
+                                fontStyle: fontStyle,
+                              ),
+                              decoration: textDecoration,
+                              decorationStyle: textDecorationStyle,
+                            ),
+                          ),
+                        ]),
+                  )
+                : pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: crossAxisAlignment,
+                      children: [
                         pw.Text(
-                          elementR.children.first.text,
+                          (((listWidgetRow.last as pw.Expanded).child
+                                          as pw.Column)
+                                      .children
+                                      .first as pw.Text)
+                                  .text
+                                  .toPlainText() +
+                              elementR.text,
                           textAlign: textAlign,
                           style: pw.TextStyle(
                             color: color,
@@ -438,24 +454,38 @@ class DocxTemplate {
                             decorationStyle: textDecorationStyle,
                           ),
                         ),
-                      ]),
-                )
-              : pw.Expanded(
-                  child: pw.Text(
-                    elementR.children.first.text,
-                    textAlign: textAlign,
-                    style: pw.TextStyle(
-                      color: color,
-                      fontSize: fontSize,
-                      font: matchFontStyle(
-                        font: font,
-                        fontWeight: fontWeight,
-                        fontStyle: fontStyle,
-                      ),
-                      decoration: textDecoration,
-                      decorationStyle: textDecorationStyle,
+                        pw.SizedBox(height: linePitch),
+                      ],
                     ),
-                  ),
+                  );
+            break;
+          }
+        }
+        listWidgetRow.add(
+          option == true
+              ? widgetOption(
+                  fontSize,
+                  color,
+                  elementR,
+                  textAlign,
+                  font,
+                  fontWeight,
+                  fontStyle,
+                  textDecoration,
+                  textDecorationStyle,
+                )
+              : widgetText(
+                  elementR: elementR,
+                  textAlign: textAlign,
+                  color: color,
+                  fontSize: fontSize,
+                  font: font,
+                  fontWeight: fontWeight,
+                  fontStyle: fontStyle,
+                  textDecoration: textDecoration,
+                  textDecorationStyle: textDecorationStyle,
+                  mainAxisAlignement: mainAxisAlignement,
+                  crossAxisAlignment: crossAxisAlignment,
                 ),
         );
 
@@ -505,5 +535,86 @@ class DocxTemplate {
         });
         break;
     }
+  }
+
+  pw.Expanded widgetText({
+    required XmlElement elementR,
+    required pw.TextAlign textAlign,
+    required PdfColor color,
+    required double fontSize,
+    required pw.Font font,
+    required pw.FontWeight fontWeight,
+    required pw.FontStyle fontStyle,
+    required pw.TextDecoration textDecoration,
+    required pw.TextDecorationStyle textDecorationStyle,
+    required pw.MainAxisAlignment mainAxisAlignement,
+    required pw.CrossAxisAlignment crossAxisAlignment,
+  }) {
+    return pw.Expanded(
+      child: pw.Column(
+        crossAxisAlignment: crossAxisAlignment,
+        children: [
+          pw.Text(
+            elementR.children.first.text,
+            textAlign: textAlign,
+            style: pw.TextStyle(
+              color: color,
+              fontSize: fontSize,
+              font: matchFontStyle(
+                font: font,
+                fontWeight: fontWeight,
+                fontStyle: fontStyle,
+              ),
+              decoration: textDecoration,
+              decorationStyle: textDecorationStyle,
+            ),
+          ),
+          pw.SizedBox(height: linePitch),
+        ],
+      ),
+    );
+  }
+
+  pw.Expanded widgetOption(
+      double fontSize,
+      PdfColor color,
+      XmlElement elementR,
+      pw.TextAlign textAlign,
+      pw.Font font,
+      pw.FontWeight fontWeight,
+      pw.FontStyle fontStyle,
+      pw.TextDecoration textDecoration,
+      pw.TextDecorationStyle textDecorationStyle) {
+    return pw.Expanded(
+      child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+        pw.SizedBox(width: 20),
+        pw.Container(
+          width: fontSize / 3,
+          height: fontSize / 3,
+          decoration: pw.BoxDecoration(
+            color: color,
+            borderRadius: pw.BorderRadius.all(
+              pw.Radius.circular(fontSize / 6),
+            ),
+          ),
+        ),
+        pw.SizedBox(width: 10),
+        pw.Text(
+          elementR.children.first.text,
+          textAlign: textAlign,
+          style: pw.TextStyle(
+            color: color,
+            fontSize: fontSize,
+            font: matchFontStyle(
+              font: font,
+              fontWeight: fontWeight,
+              fontStyle: fontStyle,
+            ),
+            decoration: textDecoration,
+            decorationStyle: textDecorationStyle,
+          ),
+        ),
+      ]),
+    );
   }
 }
