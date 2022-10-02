@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'package:equatable/equatable.dart';
+
 ///
 /// Root content element, use method add() to add inner contents
 ///
@@ -83,4 +85,27 @@ class ImageContent extends Content {
   List<int> img;
   String? filename;
   ImageContent(String key, this.img) : super(key, {});
+}
+
+class ImagePdf extends Equatable {
+  final String path;
+  final String id;
+
+  const ImagePdf({
+    required this.path,
+    required this.id,
+  });
+
+  ImagePdf copywith({
+    String? path,
+    String? id,
+  }) {
+    return ImagePdf(
+      path: path ?? this.path,
+      id: id ?? this.id,
+    );
+  }
+
+  @override
+  List<Object?> get props => [path, id];
 }

@@ -37,6 +37,15 @@ void main() {
       ),
     );
   });
+
+  test('get list image pdf', () async {
+    final f = File("doc_test.docx");
+    final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
+    final list = docx.getListeImagePdf();
+    expect(list.length, 1);
+    expect(list.first.id, 'rId8');
+    expect(list.first.path, 'media/image1.jpg');
+  });
   test('generate body', () async {
     final f = File("doc_test.docx");
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());

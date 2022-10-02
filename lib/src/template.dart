@@ -371,6 +371,36 @@ class DocxTemplate {
     return pw.Font.helvetica();
   }
 
+  List<ImagePdf> getListeImagePdf() {
+    final listImagePdf = <ImagePdf>[];
+    final vm = ViewManager.attach(_manager, tagPolicy: TagPolicy.saveText);
+    final document = vm.docxManager
+        .getEntry(() => DocxXmlEntry(), 'word/_rels/document.xml.rels')!
+        .doc;
+    document!.firstElementChild!.children.forEach((relationShipXmlElement) {
+      String id = '';
+      String type = '';
+      String target = '';
+      relationShipXmlElement.attributes.forEach((attributRelation) {
+        switch (attributRelation.name.local) {
+          case 'Id':
+            id = attributRelation.value;
+            break;
+          case 'Type':
+            type = attributRelation.value;
+            break;
+          case 'Target':
+            target = attributRelation.value;
+            break;
+        }
+      });
+      if (type.split('/').last == 'image') {
+        listImagePdf.add(ImagePdf(path: target, id: id));
+      }
+    });
+    return listImagePdf;
+  }
+
   void createRow({
     required XmlElement elementR,
     required List<pw.Widget> listWidgetRow,
