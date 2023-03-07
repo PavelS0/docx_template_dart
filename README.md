@@ -33,6 +33,7 @@ List of supported tags:
 + img - block with a picture, can be used in text or inside tables
 
 
+
 # Example
 
 ```
@@ -141,3 +142,9 @@ List of supported tags:
   final of = File('generated.docx');
   if (d != null) await of.writeAsBytes(d);
 ```
+
+DocxTemplate.generate takes two additional parameters:
+1) tagPolicy set rules to remove content control tags from the document
+2) imagePolicy
+Where ImagePolicy.remove - deletes the image if the ImageContent object is not provided
+ImagePolicy.save - leaves the original images from the template if the ImageContent object is not specified

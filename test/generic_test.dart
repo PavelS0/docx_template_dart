@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:docx_template/docx_template.dart';
+import 'package:docx_template/src/template.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -37,8 +38,8 @@ void main() {
         RowContent()
           ..add(TextContent("key1", "Paul"))
           ..add(TextContent("key2", "Viberg"))
-          ..add(TextContent("key3", "Engineer"))
-          ..add(ImageContent('img', testFileContent)),
+          ..add(TextContent("key3", "Engineer")),
+          //..add(ImageContent('img', testFileContent)),
         RowContent()
           ..add(TextContent("key1", "Alex"))
           ..add(TextContent("key2", "Houser"))
@@ -99,7 +100,7 @@ void main() {
       ]))
       ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
       ..add(ImageContent('img', testFileContent));
-    final d = await docx.generate(c);
+    final d = await docx.generate(c, imagePolicy: ImagePolicy.remove);
     if (d != null) await fileGenerated.writeAsBytes(d);
     expect(await fileGenerated.exists(), true);
   });

@@ -80,7 +80,8 @@ class RowContent extends Content {
 }
 
 class ImageContent extends Content {
-  List<int> img;
+  List<int>? img;
+  bool removeFromTemplate = false;
   String? filename;
   ImageContent(String key, this.img) : super(key, {});
 }

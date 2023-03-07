@@ -395,7 +395,10 @@ class ImgView extends View<ImageContent?> {
           }
         }
       }
+    } else if (vm.imagePolicy == ImagePolicy.remove){
+      return [];
     }
+    
     return l;
   }
 

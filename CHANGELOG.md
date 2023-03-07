@@ -56,3 +56,7 @@
 - Add test
 - Fixed null safety for xml package
 - Added function dor get all tags
+
+## 0.3.4
+- Attempt to fix archive saving
+- Added new ImagePolicy parameter to DocxTemplate.generate

@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:docx_template/docx_template.dart';
 import 'package:docx_template/src/docx_entry.dart';
+import 'package:docx_template/src/template.dart';
 import 'package:path/path.dart' as path;
 import 'package:xml/xml.dart';
 
@@ -18,20 +19,22 @@ class ViewManager {
   final DocxManager docxManager;
   final Numbering? numbering;
   final TagPolicy tagPolicy;
+  final ImagePolicy imagePolicy;
+  
   int _sdtId = 5120000;
 
   int get sdtId => _sdtId++;
 
   final Queue<View> _viewStack = Queue();
-  ViewManager._(this.root, this.numbering, this.docxManager, this.tagPolicy);
+  ViewManager._(this.root, this.numbering, this.docxManager, this.tagPolicy, this.imagePolicy);
 
   factory ViewManager.attach(DocxManager docxMan,
-      {TagPolicy tagPolicy = TagPolicy.saveText}) {
+      {TagPolicy tagPolicy = TagPolicy.saveText, ImagePolicy imgPolicy = ImagePolicy.save}) {
     final root =
         View(XmlName('root'), const [], const [], false, '', null, [], null);
     final numbering = Numbering.from(docxMan);
 
-    ViewManager vm = ViewManager._(root, numbering, docxMan, tagPolicy);
+    ViewManager vm = ViewManager._(root, numbering, docxMan, tagPolicy, imgPolicy);
     final xmlEntry =
         docxMan.getEntry(() => DocxXmlEntry(), 'word/document.xml')!;
     vm._init(xmlEntry.doc!.rootElement, root);

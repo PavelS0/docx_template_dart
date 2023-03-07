@@ -24,6 +24,16 @@ class DocxTemplateException implements Exception {
 ///
 enum TagPolicy { removeAll, saveNullified, saveText }
 
+
+///
+/// Image save policy
+///
+/// [remove] - remove template image from generated document if [ImageContent] is null 
+///
+/// [save] - save template image in generated document if [ImageContent] is null 
+///
+enum ImagePolicy {remove, save}
+
 class DocxTemplate {
   DocxTemplate._();
   late DocxManager _manager;
@@ -33,7 +43,7 @@ class DocxTemplate {
   ///
   static Future<DocxTemplate> fromBytes(List<int> bytes) async {
     final component = DocxTemplate._();
-    final arch = ZipDecoder().decodeBytes(bytes);
+    final arch = ZipDecoder().decodeBytes(bytes, verify: true);
 
     component._manager = DocxManager(arch);
 
@@ -79,12 +89,12 @@ class DocxTemplate {
   /// Generates byte buffer with docx file content by given [c]
   ///
   Future<List<int>?> generate(Content c,
-      {TagPolicy tagPolicy = TagPolicy.saveText}) async {
-    final vm = ViewManager.attach(_manager, tagPolicy: tagPolicy);
+      {TagPolicy tagPolicy = TagPolicy.saveText, ImagePolicy imagePolicy = ImagePolicy.save}) async {
+    final vm = ViewManager.attach(_manager, tagPolicy: tagPolicy, imgPolicy: imagePolicy);
     vm.produce(c);
     _manager.updateArch();
     final enc = ZipEncoder();
 
-    return enc.encode(_manager.arch);
+    return enc.encode(_manager.arch, level: Deflate.DEFAULT_COMPRESSION);
   }
 }
