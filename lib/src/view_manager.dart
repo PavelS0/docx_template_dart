@@ -38,7 +38,20 @@ class ViewManager {
     final xmlEntry =
         docxMan.getEntry(() => DocxXmlEntry(), 'word/document.xml')!;
     vm._init(xmlEntry.doc!.rootElement, root);
-
+    docxMan.arch.forEach((element) {
+      if (element.name.contains("header")) {
+        final header = docxMan.getEntry(
+                () => DocxXmlEntry(), 'word/${element.name.split('/').last}')!;
+        vm._init(header.doc!.rootElement, root);
+      }
+    });
+    docxMan.arch.forEach((element) {
+      if (element.name.contains("footer")) {
+        final header = docxMan.getEntry(
+                () => DocxXmlEntry(), 'word/${element.name.split('/').last}')!;
+        vm._init(header.doc!.rootElement, root);
+      }
+    });
     return vm;
   }
 

@@ -32,6 +32,8 @@ void main() {
 
     Content c = Content();
     c
+      ..add(TextContent("header", "Nice header"))
+      ..add(TextContent("footer", "Nice footer"))
       ..add(TextContent("docname", "Simple docname"))
       ..add(TextContent("passport", "Passport NE0323 4456673"))
       ..add(TableContent("table", [
@@ -39,7 +41,7 @@ void main() {
           ..add(TextContent("key1", "Paul"))
           ..add(TextContent("key2", "Viberg"))
           ..add(TextContent("key3", "Engineer")),
-          //..add(ImageContent('img', testFileContent)),
+        //..add(ImageContent('img', testFileContent)),
         RowContent()
           ..add(TextContent("key1", "Alex"))
           ..add(TextContent("key2", "Houser"))
