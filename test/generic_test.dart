@@ -12,7 +12,6 @@ void main() {
     }
     final f = File("template.docx");
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
-
     final testFileContent = await File('test.jpg').readAsBytes();
 
     final listNormal = ['Foo', 'Bar', 'Baz'];
