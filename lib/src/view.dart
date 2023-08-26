@@ -400,7 +400,6 @@ class ImgView extends View<ImageContent?> {
               .getEntry(() => DocxRelsEntry(), 'word/_rels/document.xml.rels'),
           ...vm.docxManager.arch.map((file) {
             if (file.name.contains("header") && file.name.contains(".rels")) {
-              print(file.name);
               return vm.docxManager.getEntry(() => DocxRelsEntry(),
                   'word/_rels/${file.name.split('/').last}');
             }
@@ -416,7 +415,6 @@ class ImgView extends View<ImageContent?> {
         listDocRelEntry.forEach((relsEntry) {
           if (idAttr != null && relsEntry != null) {
             final rel = relsEntry.getRel(idAttr);
-            print(rel?.id);
             if (rel != null) {
               final base = path.basename(rel.target);
               final ext = path.extension(base);
@@ -425,7 +423,6 @@ class ImgView extends View<ImageContent?> {
               rel.target =
                   path.join(path.dirname(rel.target), 'image$imageId$ext');
               final imagePath = 'word/${rel.target}';
-              print(imagePath);
               final relId = relsEntry.nextId();
               pr.setAttribute('r:embed', relId);
               relsEntry.add(relId, rel);

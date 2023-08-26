@@ -184,10 +184,6 @@ class ViewManager {
   List<XmlElement> _produceInner(Content? c, View v) {
     _viewStack.addFirst(v);
     List<XmlElement> produced;
-
-    print("produce ${v.tag}");
-    print("produce ${v.runtimeType}");
-    print("$c");
     if (c != null && c.containsKey(v.tag)) {
       produced = v.produce(this, c[v.tag]);
     } else if (c != null && c.key == v.tag) {

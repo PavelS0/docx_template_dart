@@ -177,8 +177,6 @@ class DocxManager {
 
   void add(String name, DocxEntry e) {
     if (_map.containsKey(name)) {
-      print(_map);
-      print(name);
       // throw DocxEntryException('Entry already exists');
     } else {
       e._name = name;
