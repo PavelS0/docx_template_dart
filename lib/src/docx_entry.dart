@@ -168,9 +168,18 @@ class DocxManager {
     }
   }
 
+  bool checkMapContainsKeys(String name) {
+    if (!_map.containsKey(name)) {
+      return true;
+    }
+    return false;
+  }
+
   void add(String name, DocxEntry e) {
     if (_map.containsKey(name)) {
-      throw DocxEntryException('Entry already exists');
+      print(_map);
+      print(name);
+      // throw DocxEntryException('Entry already exists');
     } else {
       e._name = name;
       _map[name] = e;

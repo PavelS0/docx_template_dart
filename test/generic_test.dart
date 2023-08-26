@@ -105,6 +105,7 @@ void main() {
           ..add(TextContent('multilineText', 'line 3'))
       ]))
       ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
+      ..add(ImageContent('logo', testFileContent))
       ..add(ImageContent('img', testFileContent));
     final d = await docx.generate(c, imagePolicy: ImagePolicy.remove);
     if (d != null) await fileGenerated.writeAsBytes(d);
