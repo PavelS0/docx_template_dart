@@ -102,6 +102,17 @@ class DocxRelsEntry extends DocxXmlEntry {
     _rels.children.add(n);
   }
 
+  void update(String id, DocxRel rel) {
+    final el = _rels.descendants.firstWhereOrNull((e) =>
+        e is XmlElement &&
+        e.name.local == 'Relationship' &&
+        e.getAttribute('Id') == id);
+    if (el != null) {
+      el.setAttribute('Type', rel.type);
+      el.setAttribute('Target', rel.target);
+    }
+  }
+
   XmlElement _newRel(DocxRel rel) {
     final r = XmlElement(XmlName('Relationship'));
     r.attributes

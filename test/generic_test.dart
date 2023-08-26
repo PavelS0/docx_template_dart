@@ -31,6 +31,11 @@ void main() {
 
     Content c = Content();
     c
+      ..add(HyperlinkContent(
+        key: "link",
+        text: "My new link",
+        url: "https://www.youtube.com/",
+      ))
       ..add(TextContent("header", "Nice header"))
       ..add(TextContent("footer", "Nice footer"))
       ..add(TextContent("docname", "Simple docname"))

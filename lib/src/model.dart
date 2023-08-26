@@ -62,6 +62,22 @@ class TextContent extends Content {
   }
 }
 
+class HyperlinkContent extends TextContent {
+  late String text;
+  final String url;
+  HyperlinkContent({
+    required String key,
+    required dynamic text,
+    required this.url,
+  }) : super(key, {}) {
+    if (text is String) {
+      this.text = text;
+    } else {
+      this.text = text.toString();
+    }
+  }
+}
+
 class ListContent extends Content {
   List<Content> list;
   ListContent(String key, this.list) : super(key, {});

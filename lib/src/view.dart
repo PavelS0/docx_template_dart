@@ -59,6 +59,24 @@ class TextView extends View<TextContent?> {
   List<XmlElement> produce(ViewManager vm, TextContent? c) {
     XmlElement copy = XmlCopyVisitor().visitElement(this)!;
     final r = findR(copy);
+    final pr = copy.descendants.firstWhereOrNull(
+        (e) => e is XmlElement && e.name.local == 'hyperlink');
+    if (pr != null) {
+      final idAttr = pr.getAttribute('r:id');
+
+      final docRels = vm.docxManager
+          .getEntry(() => DocxRelsEntry(), 'word/_rels/document.xml.rels');
+      if (idAttr != null && docRels != null) {
+        final rel = docRels.getRel(idAttr);
+        if (rel != null) {
+          if (c != null) {
+            rel.target = (c as HyperlinkContent).url;
+            docRels.update(idAttr, rel);
+          }
+        }
+      }
+    }
+
     if (r != null && c != null) {
       _removeRSiblings(r);
       _updateRText(vm, r, c.text);
@@ -395,10 +413,10 @@ class ImgView extends View<ImageContent?> {
           }
         }
       }
-    } else if (vm.imagePolicy == ImagePolicy.remove){
+    } else if (vm.imagePolicy == ImagePolicy.remove) {
       return [];
     }
-    
+
     return l;
   }
 
