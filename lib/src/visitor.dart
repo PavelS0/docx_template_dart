@@ -67,17 +67,17 @@ class XmlCopyVisitor with XmlVisitor {
 
   @override
   XmlCDATA visitCDATA(XmlCDATA node) {
-    return XmlCDATA(node.text);
+    return XmlCDATA(node.value);
   }
 
   @override
   XmlComment visitComment(XmlComment node) {
-    return XmlComment(node.text);
+    return XmlComment(node.value);
   }
 
   @override
   XmlDoctype visitDoctype(XmlDoctype node) {
-    return XmlDoctype(node.text);
+    return XmlDoctype(node.value!);
   }
 
   @override
@@ -164,11 +164,11 @@ class XmlCopyVisitor with XmlVisitor {
 
   @override
   XmlProcessing visitProcessing(XmlProcessing node) {
-    return XmlProcessing(node.target, node.text);
+    return XmlProcessing(node.target, node.value);
   }
 
   @override
   XmlText visitText(XmlText node) {
-    return XmlText(node.text);
+    return XmlText(node.value);
   }
 }

@@ -60,3 +60,6 @@
 ## 0.3.4
 - Attempt to fix archive saving
 - Added new ImagePolicy parameter to DocxTemplate.generate
+
+## 0.3.5
+- Fix file currupting when image removed from document

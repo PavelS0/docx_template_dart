@@ -396,9 +396,12 @@ class ImgView extends View<ImageContent?> {
         }
       }
     } else if (vm.imagePolicy == ImagePolicy.remove){
-      return [];
+      final drawing = copy.descendants
+          .firstWhereOrNull((e) => e is XmlElement && e.name.local == 'drawing');
+      if (drawing != null ) {
+        drawing.parent!.children.remove(drawing);
+      }
     }
-    
     return l;
   }
 
