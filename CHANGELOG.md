@@ -63,3 +63,6 @@
 
 ## 0.3.5
 - Fix file currupting when image removed from document
+
+## 0.3.6
+- updated sdk version
