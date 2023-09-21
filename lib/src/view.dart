@@ -134,7 +134,7 @@ class TextView extends View<TextContent?> {
       var multiline = text != null && text.contains('\n');
       if (multiline) {
         var pasteIndex = tIndex + 1;
-        final lines = text!.split('\n');
+        final lines = text.split('\n');
         for (var l in lines) {
           if (l == lines.first) {
             // Update exists T tag
