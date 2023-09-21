@@ -20,25 +20,41 @@ class ViewManager {
   final Numbering? numbering;
   final TagPolicy tagPolicy;
   final ImagePolicy imagePolicy;
-  
+
   int _sdtId = 5120000;
 
   int get sdtId => _sdtId++;
 
   final Queue<View> _viewStack = Queue();
-  ViewManager._(this.root, this.numbering, this.docxManager, this.tagPolicy, this.imagePolicy);
+  ViewManager._(this.root, this.numbering, this.docxManager, this.tagPolicy,
+      this.imagePolicy);
 
   factory ViewManager.attach(DocxManager docxMan,
-      {TagPolicy tagPolicy = TagPolicy.saveText, ImagePolicy imgPolicy = ImagePolicy.save}) {
+      {TagPolicy tagPolicy = TagPolicy.saveText,
+      ImagePolicy imgPolicy = ImagePolicy.save}) {
     final root =
         View(XmlName('root'), const [], const [], false, '', null, [], null);
     final numbering = Numbering.from(docxMan);
 
-    ViewManager vm = ViewManager._(root, numbering, docxMan, tagPolicy, imgPolicy);
+    ViewManager vm =
+        ViewManager._(root, numbering, docxMan, tagPolicy, imgPolicy);
     final xmlEntry =
         docxMan.getEntry(() => DocxXmlEntry(), 'word/document.xml')!;
     vm._init(xmlEntry.doc!.rootElement, root);
-
+    docxMan.arch.forEach((element) {
+      if (element.name.contains("header") && !element.name.contains(".rels")) {
+        final header = docxMan.getEntry(
+            () => DocxXmlEntry(), 'word/${element.name.split('/').last}')!;
+        vm._init(header.doc!.rootElement, root);
+      }
+    });
+    docxMan.arch.forEach((element) {
+      if (element.name.contains("footer") && !element.name.contains(".rels")) {
+        final header = docxMan.getEntry(
+            () => DocxXmlEntry(), 'word/${element.name.split('/').last}')!;
+        vm._init(header.doc!.rootElement, root);
+      }
+    });
     return vm;
   }
 
@@ -69,7 +85,7 @@ class ViewManager {
   }
 
   View? _initView(SdtView sdtView, View parent) {
-    const tags = ["table", "plain", "text", "list", "img"];
+    const tags = ["table", "plain", "text", "list", "img", "link"];
     View? v;
     if (tags.contains(sdtView.tag)) {
       final sdtParent = sdtView.sdt.parent!;
@@ -97,6 +113,10 @@ class ViewManager {
           break;
         case "img":
           v = ImgView(XmlName("img"), [], sdtChilds, false, sdtView.name,
+              sdtView, [], parent);
+          break;
+        case "link":
+          v = TextView(XmlName("link"), [], sdtChilds, false, sdtView.name,
               sdtView, [], parent);
           break;
       }
@@ -164,7 +184,6 @@ class ViewManager {
   List<XmlElement> _produceInner(Content? c, View v) {
     _viewStack.addFirst(v);
     List<XmlElement> produced;
-
     if (c != null && c.containsKey(v.tag)) {
       produced = v.produce(this, c[v.tag]);
     } else if (c != null && c.key == v.tag) {

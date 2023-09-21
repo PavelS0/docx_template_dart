@@ -12,7 +12,6 @@ void main() {
     }
     final f = File("template.docx");
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
-
     final testFileContent = await File('test.jpg').readAsBytes();
 
     final listNormal = ['Foo', 'Bar', 'Baz'];
@@ -32,6 +31,13 @@ void main() {
 
     Content c = Content();
     c
+      ..add(HyperlinkContent(
+        key: "link",
+        text: "My new link",
+        url: "https://www.youtube.com/",
+      ))
+      ..add(TextContent("header", "Nice header"))
+      ..add(TextContent("footer", "Nice footer"))
       ..add(TextContent("docname", "Simple docname"))
       ..add(TextContent("passport", "Passport NE0323 4456673"))
       ..add(TableContent("table", [
@@ -39,7 +45,7 @@ void main() {
           ..add(TextContent("key1", "Paul"))
           ..add(TextContent("key2", "Viberg"))
           ..add(TextContent("key3", "Engineer")),
-          //..add(ImageContent('img', testFileContent)),
+        //..add(ImageContent('img', testFileContent)),
         RowContent()
           ..add(TextContent("key1", "Alex"))
           ..add(TextContent("key2", "Houser"))
@@ -99,6 +105,7 @@ void main() {
           ..add(TextContent('multilineText', 'line 3'))
       ]))
       ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
+      ..add(ImageContent('logo', testFileContent))
       ..add(ImageContent('img', testFileContent));
     final d = await docx.generate(c, imagePolicy: ImagePolicy.remove);
     if (d != null) await fileGenerated.writeAsBytes(d);

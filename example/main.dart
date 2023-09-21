@@ -38,6 +38,8 @@ void main() async {
 
   Content content = Content();
   content
+    ..add(TextContent("header", "Nice header"))
+    ..add(TextContent("footer", "Nice footer"))
     ..add(TextContent("docname", "Simple docname"))
     ..add(TextContent("passport", "Passport NE0323 4456673"))
     ..add(TableContent("table", [

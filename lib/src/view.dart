@@ -59,6 +59,24 @@ class TextView extends View<TextContent?> {
   List<XmlElement> produce(ViewManager vm, TextContent? c) {
     XmlElement copy = XmlCopyVisitor().visitElement(this)!;
     final r = findR(copy);
+    final pr = copy.descendants.firstWhereOrNull(
+        (e) => e is XmlElement && e.name.local == 'hyperlink');
+    if (pr != null) {
+      final idAttr = pr.getAttribute('r:id');
+
+      final docRels = vm.docxManager
+          .getEntry(() => DocxRelsEntry(), 'word/_rels/document.xml.rels');
+      if (idAttr != null && docRels != null) {
+        final rel = docRels.getRel(idAttr);
+        if (rel != null) {
+          if (c != null) {
+            rel.target = (c as HyperlinkContent).url;
+            docRels.update(idAttr, rel);
+          }
+        }
+      }
+    }
+
     if (r != null && c != null) {
       _removeRSiblings(r);
       _updateRText(vm, r, c.text);
@@ -377,23 +395,42 @@ class ImgView extends View<ImageContent?> {
       if (pr != null) {
         final idAttr = pr.getAttribute('r:embed');
 
-        final docRels = vm.docxManager
-            .getEntry(() => DocxRelsEntry(), 'word/_rels/document.xml.rels');
-        if (idAttr != null && docRels != null) {
-          final rel = docRels.getRel(idAttr);
-          if (rel != null) {
-            final base = path.basename(rel.target);
-            final ext = path.extension(base);
-            final imageId = docRels.nextImageId();
-            rel.target =
-                path.join(path.dirname(rel.target), 'image$imageId$ext');
-            final imagePath = 'word/${rel.target}';
-            final relId = docRels.nextId();
-            pr.setAttribute('r:embed', relId);
-            docRels.add(relId, rel);
-            vm.docxManager.add(imagePath, DocxBinEntry(c.img));
+        final listDocRelEntry = <DocxRelsEntry?>[
+          vm.docxManager
+              .getEntry(() => DocxRelsEntry(), 'word/_rels/document.xml.rels'),
+          ...vm.docxManager.arch.map((file) {
+            if (file.name.contains("header") && file.name.contains(".rels")) {
+              return vm.docxManager.getEntry(() => DocxRelsEntry(),
+                  'word/_rels/${file.name.split('/').last}');
+            }
+          }).where((element) => element != null),
+          ...vm.docxManager.arch.map((file) {
+            if (file.name.contains("footer") && file.name.contains(".rels")) {
+              return vm.docxManager.getEntry(() => DocxRelsEntry(),
+                  'word/_rels/${file.name.split('/').last}');
+            }
+          }).where((element) => element != null),
+        ];
+
+        listDocRelEntry.forEach((relsEntry) {
+          if (idAttr != null && relsEntry != null) {
+            final rel = relsEntry.getRel(idAttr);
+            if (rel != null) {
+              final base = path.basename(rel.target);
+              final ext = path.extension(base);
+              final imageId = relsEntry.nextImageId();
+
+              rel.target =
+                  path.join(path.dirname(rel.target), 'image$imageId$ext');
+              final imagePath = 'word/${rel.target}';
+              final relId = relsEntry.nextId();
+              pr.setAttribute('r:embed', relId);
+              relsEntry.add(relId, rel);
+
+              vm.docxManager.add(imagePath, DocxBinEntry(c.img));
+            }
           }
-        }
+        });
       }
     } else if (vm.imagePolicy == ImagePolicy.remove){
       final drawing = copy.descendants
