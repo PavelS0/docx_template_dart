@@ -419,10 +419,6 @@ class ImgView extends View<ImageContent?> {
               final base = path.basename(rel.target);
               final ext = path.extension(base);
               final imageId = relsEntry.nextImageId();
-              print("'/////////////////////////'");
-              print("imageId: $imageId");
-              print("base: $base");
-              print("ext: $ext");
 
               rel.target =
                   path.join(path.dirname(rel.target), 'image$imageId$ext');
