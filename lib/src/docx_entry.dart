@@ -68,10 +68,10 @@ class DocxRel {
 }
 
 class DocxRelsEntry extends DocxXmlEntry {
-  DocxRelsEntry();
+  DocxRelsEntry({int? imageId = 1000}) : _imageId = imageId!;
   late XmlElement _rels;
   int _id = 1000;
-  int _imageId = 1000;
+  int _imageId;
 
   String nextId() {
     _id++;

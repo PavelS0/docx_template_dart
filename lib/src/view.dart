@@ -400,13 +400,13 @@ class ImgView extends View<ImageContent?> {
               .getEntry(() => DocxRelsEntry(), 'word/_rels/document.xml.rels'),
           ...vm.docxManager.arch.map((file) {
             if (file.name.contains("header") && file.name.contains(".rels")) {
-              return vm.docxManager.getEntry(() => DocxRelsEntry(),
+              return vm.docxManager.getEntry(() => DocxRelsEntry(imageId: 2000),
                   'word/_rels/${file.name.split('/').last}');
             }
           }).where((element) => element != null),
           ...vm.docxManager.arch.map((file) {
             if (file.name.contains("footer") && file.name.contains(".rels")) {
-              return vm.docxManager.getEntry(() => DocxRelsEntry(),
+              return vm.docxManager.getEntry(() => DocxRelsEntry(imageId: 3000),
                   'word/_rels/${file.name.split('/').last}');
             }
           }).where((element) => element != null),
