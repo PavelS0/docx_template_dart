@@ -60,3 +60,21 @@
 ## 0.3.4
 - Attempt to fix archive saving
 - Added new ImagePolicy parameter to DocxTemplate.generate
+
+## 0.3.5
+- Fix file currupting when image removed from document
+
+## 0.3.6
+- updated sdk version
+
+## 0.4.0
+- updated to dart ^3.0.0
+- merged PR #48
+ -  header and footer modification
+ -   fix lose reference after callings getTags
+ -   xml update
+ -   add hyperlink (use link tag and use HyperlinkContent(
+            key: "link",
+            text: "My new link",
+            url: "https://www.youtube.com/",
+        ))
