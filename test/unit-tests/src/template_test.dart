@@ -8,15 +8,20 @@ void main() {
     final f = File("template.docx");
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
     final list = docx.getTags();
-    expect(list.length, 8);
-    expect(list.first, 'docname');
-    expect(list[1], 'list');
-    expect(list[2], 'table');
-    expect(list[3], 'passport');
-    expect(list[4], 'plainlist');
-    expect(list[5], 'multilineList');
-    expect(list[6], 'multilineText2');
-    expect(list[7], 'img');
+    print(list);
+    expect(list.length, 12);
+    expect(list.first, 'imgFirst');
+    expect(list[1], 'docname');
+    expect(list[2], 'list');
+    expect(list[3], 'table');
+    expect(list[4], 'passport');
+    expect(list[5], 'plainlist');
+    expect(list[6], 'multilineList');
+    expect(list[7], 'multilineText2');
+    expect(list[8], 'img');
+    expect(list[9], 'link');
+    expect(list[10], 'header');
+    expect(list[11], 'logo');
   });
 
   // test('generate pdf', () async {
