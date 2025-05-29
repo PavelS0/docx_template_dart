@@ -24,9 +24,9 @@ abstract class DocxEntry {
 
   void _updateData(Archive arch, List<int> data) {
     if (_index < 0) {
-      arch.addFile(ArchiveFile(_name, data.length, data));
+      arch.addFile(ArchiveFile.bytes(_name, data));
     } else {
-      arch.files[_index] = ArchiveFile(_name, data.length, data);
+      arch.modifyAtIndex(_index, ArchiveFile.bytes(_name, data));
     }
   }
 }
