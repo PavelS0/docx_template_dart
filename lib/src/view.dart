@@ -147,6 +147,10 @@ class TextView extends View<TextContent?> {
             r.children.insert(pasteIndex++, tCp);
           }
           r.children.insert(pasteIndex++, _brElement());
+
+          if (l != lines.last) {
+            r.children.insert(pasteIndex++, _brElement());
+          }
         }
       } else {
         t.children[0] = XmlText(text!);
@@ -412,7 +416,7 @@ class ImgView extends View<ImageContent?> {
           }).where((element) => element != null),
         ];
 
-        listDocRelEntry.forEach((relsEntry) {
+        for (var relsEntry in listDocRelEntry) {
           if (idAttr != null && relsEntry != null) {
             final rel = relsEntry.getRel(idAttr);
             if (rel != null) {
@@ -420,22 +424,25 @@ class ImgView extends View<ImageContent?> {
               final ext = path.extension(base);
               final imageId = relsEntry.nextImageId();
 
-              rel.target =
-                  path.join(path.dirname(rel.target), 'image$imageId$ext');
-              final imagePath = 'word/${rel.target}';
-              final relId = relsEntry.nextId();
-              pr.setAttribute('r:embed', relId);
-              relsEntry.add(relId, rel);
+              final newRel = DocxRel(
+                  idAttr,
+                  'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+                  'media/$imageId$ext');
 
-              vm.docxManager.add(imagePath, DocxBinEntry(c.img));
+              relsEntry.update(idAttr, newRel);
+
+              pr.setAttribute('r:embed', idAttr);
+
+              vm.docxManager
+                  .add('word/media/$imageId$ext', DocxBinEntry(c.img));
             }
           }
-        });
+        }
       }
-    } else if (vm.imagePolicy == ImagePolicy.remove){
-      final drawing = copy.descendants
-          .firstWhereOrNull((e) => e is XmlElement && e.name.local == 'drawing');
-      if (drawing != null ) {
+    } else if (vm.imagePolicy == ImagePolicy.remove) {
+      final drawing = copy.descendants.firstWhereOrNull(
+          (e) => e is XmlElement && e.name.local == 'drawing');
+      if (drawing != null) {
         drawing.parent!.children.remove(drawing);
       }
     }

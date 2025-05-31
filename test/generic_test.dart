@@ -12,7 +12,9 @@ void main() {
     }
     final f = File("template.docx");
     final docx = await DocxTemplate.fromBytes(await f.readAsBytes());
+
     final testFileContent = await File('test.jpg').readAsBytes();
+    final test2FileContent = await File('test2.jpg').readAsBytes();
 
     final listNormal = ['Foo', 'Bar', 'Baz'];
     final listBold = ['ooF', 'raB', 'zaB'];
@@ -36,8 +38,8 @@ void main() {
         text: "My new link",
         url: "https://www.youtube.com/",
       ))
-      ..add(TextContent("header", "Nice header"))
-      ..add(TextContent("footer", "Nice footer"))
+      // ..add(TextContent("header", "Nice header"))
+      // ..add(TextContent("footer", "Nice footer"))
       ..add(TextContent("docname", "Simple docname"))
       ..add(TextContent("passport", "Passport NE0323 4456673"))
       ..add(TableContent("table", [
@@ -106,6 +108,7 @@ void main() {
       ]))
       ..add(TextContent('multilineText2', 'line 1\nline 2\n line 3'))
       ..add(ImageContent('logo', testFileContent))
+      ..add(ImageContent('imgFirst', test2FileContent))
       ..add(ImageContent('img', testFileContent));
     final d = await docx.generate(c, imagePolicy: ImagePolicy.remove);
     if (d != null) await fileGenerated.writeAsBytes(d);

@@ -48,13 +48,13 @@ class ViewManager {
         vm._init(header.doc!.rootElement, root);
       }
     });
-    docxMan.arch.forEach((element) {
-      if (element.name.contains("footer") && !element.name.contains(".rels")) {
-        final header = docxMan.getEntry(
-            () => DocxXmlEntry(), 'word/${element.name.split('/').last}')!;
-        vm._init(header.doc!.rootElement, root);
-      }
-    });
+    // docxMan.arch.forEach((element) {
+    //   if (element.name.contains("footer") && !element.name.contains(".rels")) {
+    //     final header = docxMan.getEntry(
+    //         () => DocxXmlEntry(), 'word/${element.name.split('/').last}')!;
+    //     vm._init(header.doc!.rootElement, root);
+    //   }
+    // });
     return vm;
   }
 
